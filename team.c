@@ -33,7 +33,7 @@ time_t dateTimeFormatter(char date[10], char time[5])
 struct Team *teams[1000];
 
 void print_team_name(int i){
-    printf("Project Team %s is created\n", teams[i]->team_name);
+    printf(">>>>>> Project Team %s is created\n", teams[i]->team_name);
 
     //testing
     printf("Detail: %s %s %s %s %s\n", teams[i]->project_name, teams[i]->manager, teams[i]->member[0], teams[i]->member[1], teams[i]->member[2]);

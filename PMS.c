@@ -22,7 +22,7 @@ int main(){
     scanf("%s", choice);
 
     if (strcmp(choice, "1") == 0){
-        printf("choice %s\n", choice);
+        printf("choice %s\nEnter> ", choice);
         boolean = 1;
 
         scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
