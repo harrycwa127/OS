@@ -8,7 +8,7 @@ struct Team{
     // struct Project projects[];   // the list of project in the teams
     char *project_name;             // name of the project
     char *manager;                  // only 1 manage
-    char member [3][50];                // three member
+    char member[3][50];                // three member
     time_t dateTime;
     float duration;
 };
@@ -43,4 +43,12 @@ void create_team(char *team_name, char *project_name, char *manager, char member
 
     //append
     teams[i] = &temp;
+    print_team_name(i);
+}
+
+void print_team_name(int i){
+    printf("Project Team %s is created", teams[i]->team_name);
+
+    //testing
+    printf("Detail: %s %s %s %s %s", teams[i]->project_name, teams[i]->manager, teams[i]->member[0], teams[i]->member[1], teams[i]->member[2]);
 }
