@@ -1,6 +1,6 @@
 # COMP 2432 Group Project <br>
 
-### Group member:
+### Group 28 (G28) member:
 > HO Yiu Tung
 > LEUNG Chun Choi
 > TSANG Chun Hei
