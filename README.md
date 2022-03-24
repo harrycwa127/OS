@@ -1,5 +1,5 @@
 # COMP 2432 Group Project <br>
-<p>To execute the program</p><br>
+<p>To execute the program</p>
 
     ./PMS
 
