@@ -2,7 +2,7 @@
 <br>
 <p>To execute the program</p><br>
 
-> ./PMS
+    ./PMS
 
 ---
 
