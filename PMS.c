@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "team.c"
 
 int main(){
     char choice[2];
