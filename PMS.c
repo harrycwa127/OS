@@ -26,7 +26,7 @@ int main(){
         boolean = 1;
 
         scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
-        create_team(team_name, project_name, manager, member);
+        create_team(team_name, project_name, manager, *member);
     } 
     else if (strcmp(choice, "2a") == 0){
         printf("choice %s", choice);
