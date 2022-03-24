@@ -2,7 +2,7 @@
 #include "team.c"
 
 int main(){
-    char choice[2];
+    char choice[2], team_name[50], project_name[50], manager[50], member[3][50];
     int boolean = 1; //0 = flase, 1 = true
 
     printf("~~ WELCOME TO PolyStar\n\n");
@@ -24,6 +24,9 @@ int main(){
     if (strcmp(choice, "1") == 0){
         printf("choice %s", choice);
         boolean = 1;
+
+        scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
+        create_team(team_name, project_name, manager, member);
     } 
     else if (strcmp(choice, "2a") == 0){
         printf("choice %s", choice);
