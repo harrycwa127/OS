@@ -32,8 +32,15 @@ time_t dateTimeFormatter(char date[10], char time[5])
 
 struct Team *teams[1000];
 
+void print_team_name(int i){
+    printf("Project Team %s is created\n", teams[i]->team_name);
+
+    //testing
+    printf("Detail: %s %s %s %s %s\n", teams[i]->project_name, teams[i]->manager, teams[i]->member[0], teams[i]->member[1], teams[i]->member[2]);
+}
+
 void create_team(char *team_name, char *project_name, char *manager, char member[3][50]){
-    struct Team temp = { .team_name=team_name, .project_name=project_name, .manager=manager, .member=*member };  // decalre new Team for append
+    struct Team temp = { .team_name=team_name, .project_name=project_name, .manager=manager, .member=**member };  // decalre new Team for append
 
     // findout the last element for append
     int i = 0;
@@ -44,11 +51,4 @@ void create_team(char *team_name, char *project_name, char *manager, char member
     //append
     teams[i] = &temp;
     print_team_name(i);
-}
-
-void print_team_name(int i){
-    printf("Project Team %s is created", teams[i]->team_name);
-
-    //testing
-    printf("Detail: %s %s %s %s %s", teams[i]->project_name, teams[i]->manager, teams[i]->member[0], teams[i]->member[1], teams[i]->member[2]);
 }

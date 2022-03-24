@@ -22,39 +22,39 @@ int main(){
     scanf("%s", choice);
 
     if (strcmp(choice, "1") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
 
         scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
-        create_team(team_name, project_name, manager, *member);
+        create_team(team_name, project_name, manager, member);
     } 
     else if (strcmp(choice, "2a") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
     }
     else if (strcmp(choice, "2b") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
     }
     else if (strcmp(choice, "2c") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
     }
     else if (strcmp(choice, "3a") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
     }
     else if (strcmp(choice, "3b") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
     }
     else if (strcmp(choice, "3c") == 0){
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         boolean = 1;
     }
     else if (strcmp(choice, "4") == 0)
     {
-        printf("choice %s", choice);
+        printf("choice %s\n", choice);
         return 0;
     }
     else{
