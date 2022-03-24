@@ -1,10 +1,10 @@
 # COMP 2432 Group Project <br>
 
 ### Group 28 (G28) member:
-> HO Yiu Tung
-> LEUNG Chun Choi
-> TSANG Chun Hei
-> WONG Chung Wing
+> HO Yiu Tung <br>
+> LEUNG Chun Choi <br>
+> TSANG Chun Hei <br>
+> WONG Chung Wing <br>
 > WONG Kit Hay Eugene Felipe
 
 <p>To execute the program</p>
