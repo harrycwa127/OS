@@ -10,12 +10,19 @@ struct Team{
     char *member[3];    // three member
 };
 
-struct Team *teams[];
+struct Team *teams[1000];
 
 int main(int argc, char *argv[]){
     printf("hi");
 }
 
-// void create_project(char *project_name){
-//     teams.projects.name = project_name;
-// }
+void create_team(char *team_name, char *project_name, char *manager, char *member[3]){
+    struct Team temp = { .team_name=team_name, .project_name=project_name, .manager=manager, .member=member };
+
+    int i = 0;
+    while(teams[i] != NULL){
+        i++;
+    }
+
+    teams[i] = &temp;
+}
