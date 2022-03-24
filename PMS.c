@@ -1,24 +1,25 @@
 #include <stdio.h>
+#include <string.h>
 #include "team.c"
 
 int main(){
     char choice[2], team_name[50], project_name[50], manager[50], member[3][50];
     int boolean = 1; //0 = flase, 1 = true
 
-    printf("~~ WELCOME TO PolyStar\n\n");
-    printf("1. Create Project Team\n\n");
-    printf("2. Project Meeting Request\n");
-    printf("\t2a. Single input\n");
-    printf("\t2b. Batch input\n");
-    printf("\t2c. Meeting Attendance\n\n");
-    printf("3. Print Meeting Schedule\n");
-    printf("\t3a. FCFS (First Come First Served)\n");
-    printf("\t3b. XXXX (Another algorithm implemented)\n");
-    printf("\t3c. YYYY (Attendance Report) (if implemented)\n\n");
-    printf("4. exit\n");
-
+    printf("\n\t~~ WELCOME TO PolyStar ~~\n\n");
+    printf("1.\tCreate Project Team\n\n");
+    printf("2.\tProject Meeting Request\n");
+    printf("\t2a.  Single input\n");
+    printf("\t2b.  Batch input\n");
+    printf("\t2c.  Meeting Attendance\n\n");
+    printf("3.\tPrint Meeting Schedule\n");
+    printf("\t3a.  FCFS (First Come First Served)\n");
+    printf("\t3b.  XXXX (Another algorithm implemented)\n");
+    printf("\t3c.  YYYY (Attendance Report)\n\n");
+    printf("4.\tExit\n");
+    
     do{
-    printf("Enter an option:");
+    printf("  Enter an option: ");
     scanf("%s", choice);
 
     if (strcmp(choice, "1") == 0){
