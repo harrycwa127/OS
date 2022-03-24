@@ -8,7 +8,7 @@ struct Team{
     // struct Project projects[];   // the list of project in the teams
     char *project_name;             // name of the project
     char *manager;                  // only 1 manage
-    char member [3][50];                // three member
+    char member[3][50];                // three member
     time_t dateTime;
     float duration;
 };
