@@ -1,4 +1,12 @@
 # COMP 2432 Group Project <br>
+
+### Group member:
+> HO Yiu Tung
+> LEUNG Chun Choi
+> TSANG Chun Hei
+> WONG Chung Wing
+> WONG Kit Hay Eugene Felipe
+
 <p>To execute the program</p>
 
     ./PMS
