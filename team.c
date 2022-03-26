@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 
 struct Team{
     int team_id;
@@ -15,22 +16,22 @@ struct Team{
 };
 
 struct Team teams[1000];
+int team_counter = 0;
+
+void print_team_name(int i){
+    printf(">>>>>> Project Team %s is created\n", teams[i].team_name);
+}
+
 void create_team(char team_name[100], char project_name[100], char manager[100], char member[3][50]){
 
-    // findout the last element for append
-    int i = 0;
-    while(teams[i].team_id != NULL){
-        i++;
-    }
-
-    teams[i].team_id = i;
-    strcpy( teams[i].team_name,team_name);
-    strcpy( teams[i].project_name,project_name);
-    strcpy( teams[i].manager,manager);
-    strcpy( teams[i].member[0],member[0]);
-    strcpy( teams[i].member[1],member[1]);
-    strcpy( teams[i].member[2],member[2]);
-    print_team_name(i);
+    teams[team_counter].team_id = team_counter;
+    strcpy( teams[team_counter].team_name,team_name);
+    strcpy( teams[team_counter].project_name,project_name);
+    strcpy( teams[team_counter].manager,manager);
+    strcpy( teams[team_counter].member[0],member[0]);
+    strcpy( teams[team_counter].member[1],member[1]);
+    strcpy( teams[team_counter].member[2],member[2]);
+    print_team_name(team_counter);
 }
 
 time_t dateTimeFormatter(char date[10], char time[5])
@@ -48,13 +49,5 @@ time_t dateTimeFormatter(char date[10], char time[5])
             printf("Could not convert time input to time_t\n");
     } else printf("The input was not a valid time format\n");
     return dateTime;
-}
-
-
-void print_team_name(int i){
-    printf("Project Team %s is created\n", teams[i].team_name);
-
-    //testing
-    printf("Detail: %i %s %s %s %s %s", teams[i].team_id + 1, teams[i].project_name, teams[i].manager, teams[i].member[0], teams[i].member[1], teams[i].member[2]);
 }
 
