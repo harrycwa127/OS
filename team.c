@@ -4,14 +4,34 @@
 #include <time.h>
 
 struct Team{
-    char *team_name;                 // the name of the teams
+    int team_id;
+    char team_name[100];                 // the name of the teams
     // struct Project projects[];   // the list of project in the teams
-    char *project_name;             // name of the project
-    char *manager;                  // only 1 manage
+    char project_name[100];             // name of the project
+    char manager[100];                  // only 1 manage
     char member[3][50];                // three member
     time_t dateTime;
     float duration;
 };
+
+struct Team teams[1000];
+void create_team(char team_name[100], char project_name[100], char manager[100], char member[3][50]){
+
+    // findout the last element for append
+    int i = 0;
+    while(teams[i].team_id != NULL){
+        i++;
+    }
+
+    teams[i].team_id = i;
+    strcpy( teams[i].team_name,team_name);
+    strcpy( teams[i].project_name,project_name);
+    strcpy( teams[i].manager,manager);
+    strcpy( teams[i].member[0],member[0]);
+    strcpy( teams[i].member[1],member[1]);
+    strcpy( teams[i].member[2],member[2]);
+    print_team_name(i);
+}
 
 time_t dateTimeFormatter(char date[10], char time[5])
 {
@@ -30,25 +50,11 @@ time_t dateTimeFormatter(char date[10], char time[5])
     return dateTime;
 }
 
-struct Team *teams[1000];
 
 void print_team_name(int i){
-    printf(">>>>>> Project Team %s is created\n", teams[i]->team_name);
+    printf("Project Team %s is created\n", teams[i].team_name);
 
     //testing
-    printf("Detail: %s %s %s %s %s\n", teams[i]->project_name, teams[i]->manager, teams[i]->member[0], teams[i]->member[1], teams[i]->member[2]);
+    printf("Detail: %i %s %s %s %s %s", teams[i].team_id + 1, teams[i].project_name, teams[i].manager, teams[i].member[0], teams[i].member[1], teams[i].member[2]);
 }
 
-void create_team(char *team_name, char *project_name, char *manager, char member[3][50]){
-    struct Team temp = { .team_name=team_name, .project_name=project_name, .manager=manager, .member=**member };  // decalre new Team for append
-
-    // findout the last element for append
-    int i = 0;
-    while(teams[i] != NULL){
-        i++;
-    }
-
-    //append
-    teams[i] = &temp;
-    print_team_name(i);
-}
