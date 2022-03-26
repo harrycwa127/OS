@@ -16,18 +16,14 @@ void print_main_menu(){
 }
 
 int main(){
-    char choice[2];
-
-    print_main_menu();
+    char choice[3];
 
     do{
+        print_main_menu();
         printf("Enter an option:");
         scanf("%s", choice);
         
-        if (strcmp(choice, "0") == 0){
-            print_main_menu();
-        }
-        else if (strcmp(choice, "1") == 0){
+        if (strcmp(choice, "1") == 0){
             char choice[2], team_name[50], project_name[50], manager[50], member[3][50];
             printf("Enter> ");
             scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
@@ -60,6 +56,12 @@ int main(){
             printf("Unaccepted input, please input the correct input.\n");
             printf("If you chooces the option 2a, please input \"2a\" instead of \"2\" only\n");
         }
+
+        // wait for input 0 to back to main
+        do{
+            printf("Enter> ");
+            scanf("%s", choice);
+        }while(strcmp(choice, "0") == 0);
 
     }while(1);
     return 0;
