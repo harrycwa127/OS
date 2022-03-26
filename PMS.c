@@ -24,7 +24,7 @@ int main(){
         scanf("%s", choice);
         
         if (strcmp(choice, "1") == 0){
-            char choice[2], team_name[50], project_name[50], manager[50], member[3][50];
+            char team_name[50], project_name[50], manager[50], member[3][50];
             printf("Enter> ");
             scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
             create_team(team_name, project_name, manager, member);
