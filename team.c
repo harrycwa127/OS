@@ -23,14 +23,14 @@ void print_team_name(int i){
 }
 
 void create_team(char team_name[100], char project_name[100], char manager[100], char member[3][50]){
-
+    int i;
     teams[team_counter].team_id = team_counter;
     strcpy( teams[team_counter].team_name,team_name);
     strcpy( teams[team_counter].project_name,project_name);
     strcpy( teams[team_counter].manager,manager);
-    strcpy( teams[team_counter].member[0],member[0]);
-    strcpy( teams[team_counter].member[1],member[1]);
-    strcpy( teams[team_counter].member[2],member[2]);
+    for (i = 0; i < 3; i++){
+        strcpy(teams[team_counter].member[i],member[i]);
+    }
     print_team_name(team_counter);
 }
 

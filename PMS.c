@@ -17,6 +17,7 @@ void print_main_menu(){
 
 int main(){
     char choice[3];
+    int i;
 
     do{
         print_main_menu();
@@ -25,8 +26,22 @@ int main(){
         
         if (strcmp(choice, "1") == 0){
             char team_name[50], project_name[50], manager[50], member[3][50];
-            printf("Enter> ");
-            scanf("%s %s %s %s %s %s", team_name, project_name, manager, member[0], member[1], member[2]);
+            char str[100];
+            char temp; //for clear buffer
+            printf("Enter: ");
+            scanf("%c",&temp);
+            scanf("%[^\n]s",str);
+            char * token = strtok(str, " ");
+            strcpy(team_name,token);
+            token = strtok(NULL, " ");
+            strcpy(project_name,token);
+            token = strtok(NULL, " ");
+            strcpy(manager,token);
+            while (token != NULL && i < 3){
+                strcpy(member[i],token);
+                token = strtok(NULL, " ");
+                i++;
+            }  
             create_team(team_name, project_name, manager, member);
         } 
         else if (strcmp(choice, "2a") == 0){
