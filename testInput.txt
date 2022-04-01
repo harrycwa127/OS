@@ -1,0 +1,8 @@
+1. Create Project Team
+
+2 same team different Project
+Team_A Project_A Alan Cathy Fanny Helen
+Team_A Project_B Alan Cathy Fanny Helen
+
+only 1 Man 1 mem
+Team_A Project_C Alan Cathy
