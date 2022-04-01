@@ -4,5 +4,15 @@
 Team_A Project_A Alan Cathy Fanny Helen
 Team_A Project_B Alan Cathy Fanny Helen
 
-only 1 Man 1 mem
+only 1 Man 1 mem - 2mem
 Team_A Project_C Alan Cathy
+Team_A Project_D Alan Cathy Fanny
+
+error case:only 1 Man --> success
+Team_A Project_E Ala
+
+error case:more than 3 Man --> 
+Team_A Project_F Ala Alan Cathy Fanny Helen
+
+error case:same Project --> success
+Team_A Project_A Alan Cathy Fanny Helen

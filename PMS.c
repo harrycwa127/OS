@@ -17,32 +17,29 @@ void print_main_menu(){
 
 int main(){
     char choice[3];
-    int i;
-
     do{
         print_main_menu();
         printf("Enter an option:");
         scanf("%s", choice);
         
         if (strcmp(choice, "1") == 0){
-            char team_name[50], project_name[50], manager[50], member[3][50];
-            char str[100];
-            char temp; //for clear buffer
-            printf("Enter: ");
-            scanf("%c",&temp);
-            scanf("%[^\n]s",str);
-            char * token = strtok(str, " ");
-            strcpy(team_name,token);
-            token = strtok(NULL, " ");
-            strcpy(project_name,token);
-            token = strtok(NULL, " ");
-            strcpy(manager,token);
-            while (token != NULL && i < 3){
-                strcpy(member[i],token);
-                token = strtok(NULL, " ");
-                i++;
-            }  
-            create_team(team_name, project_name, manager, member);
+            int error = 0; // 0 = false 1 = true
+            do{
+                error = input_team();
+                if(error == 1){
+                    do{
+                    printf("Fail to creat team, do you want to create again\n");
+                    printf("\"0\" to go back to menu ,Input \"1\" to create again\n");
+                    scanf("%d", &error);
+                    }while(error != 0 && error != 1);
+                }else{
+                    do{
+                    printf("Craetion success, do you want to create new one?\n");
+                    printf("\"0\" to go back to menu ,Input \"1\" to create new one\n");
+                    scanf("%d", &error);
+                    }while(error != 0 && error != 1);
+                }
+            }while(error != 0);
         } 
         else if (strcmp(choice, "2a") == 0){
             printf("choice %s", choice);
@@ -70,14 +67,19 @@ int main(){
         else{
             printf("Unaccepted input, please input the correct input.\n");
             printf("If you chooces the option 2a, please input \"2a\" instead of \"2\" only\n");
+            do{
+            printf("Enter> ");
+            scanf("%s", choice);
+            }while(strcmp(choice, "0") == 0);
         }
 
-        // wait for input 0 to back to main
+        // wait for input 0 to back to main <-- ????????
+        /*
         do{
             printf("Enter> ");
             scanf("%s", choice);
         }while(strcmp(choice, "0") == 0);
-
+        */
     }while(1);
     return 0;
 }
