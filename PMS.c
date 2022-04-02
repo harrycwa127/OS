@@ -88,18 +88,29 @@ int main(){
 
             // ask for file_name
             printf("For %s, ", choice);
-            fgets(file_name,40,stdin);
-
+            scanf("%s", &file_name);
+            printf("Filename: %s\n", file_name);
             file = fopen(file_name, "r");
 
             // check file
             if (file == NULL) exit(EXIT_FAILURE);
 
             // read file line by line
-            while ((read = getline(&line, &len, file)) != -1) {
-                printf("Retrieved line of length %zu:\n", read);
-                printf("%s", line);
+            // while ((read = getline(&line, &len, file)) != -1) {
+            //     printf("Retrieved line of length %zu:\n", read);
+            //     char buffer[50];
+            //     fgets(buffer, 50,file);
+            //     printf("Content: %s\n", buffer);
+            // }
+            char buffer[50];
+            int lineNum = 0;
+            while(fgets(buffer, 50, file)!=NULL)
+            {                
+                lineNum+=1;
+                printf("Content: %s in line %d\n", buffer,lineNum);
             }
+            
+
 
             //close file after read done
             fclose(file);
