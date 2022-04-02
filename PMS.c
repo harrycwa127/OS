@@ -80,7 +80,25 @@ int main(){
                 }
             }
         }else if (strcmp(choice, "2b") == 0){
-            printf("choice %s\n", choice);      //debug use
+            FILE* file;
+            char * line = NULL;
+            size_t len = 0;
+            ssize_t read;
+            file = fopen("/etc/motd", "r");
+
+            // check file
+            if (file == NULL) exit(EXIT_FAILURE);
+
+            // read file line by line
+            while ((read = getline(&line, &len, file)) != -1) {
+                printf("Retrieved line of length %zu:\n", read);
+                printf("%s", line);
+            }
+
+            //close file after read done
+            fclose(file);
+            if (line) free(line);
+                
         }else if (strcmp(choice, "2c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "3a") == 0){
