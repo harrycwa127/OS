@@ -82,7 +82,6 @@ int main(){
         }else if (strcmp(choice, "2b") == 0){
             FILE* file;
             char* line = NULL;
-            size_t len = 0;
             ssize_t read;
             char file_name[40];
 
@@ -95,19 +94,18 @@ int main(){
             // check file
             if (file == NULL) exit(EXIT_FAILURE);
 
-            char buffer[500];
-            int lineNum = 0;
-            while(fgets(buffer, 500, file)!=NULL)
+            char buffer[200];
+            // int lineNum = 0;
+            while(fgets(buffer, 200, file)!=NULL)
             {                
-                lineNum+=1;
-                printf("Content: %s in line %d\n", buffer,lineNum);
+                // lineNum+=1;
+                // printf("Content: %s in line %d\n", buffer,lineNum);
 
                 // if(buffer[0] == '0') break;
                 char *ptr = strtok(buffer, " ");
                 char storage[4][50];
                 int i;
                 
-                for(i=0;i<4;i++){ strcpy(storage[i], "");}
                 for(i=0;i<4;i++){
                     strcpy(storage[i], ptr);
                     ptr = strtok(NULL, " ");
