@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 
 #define team_size 1000
 
@@ -57,6 +58,25 @@ void create_team(char team_name[50], char project_name[50], char manager[50], ch
             printf("Project Team %s is created.\n", team_name);
             break;
         }
+}
+
+struct Team teams[1000];
+int team_counter = 0;
+
+void print_team_name(int i){
+    printf(">>>>>> Project Team %s is created\n", teams[i].team_name);
+}
+
+void create_team(char team_name[100], char project_name[100], char manager[100], char member[3][50]){
+
+    teams[team_counter].team_id = team_counter;
+    strcpy( teams[team_counter].team_name,team_name);
+    strcpy( teams[team_counter].project_name,project_name);
+    strcpy( teams[team_counter].manager,manager);
+    strcpy( teams[team_counter].member[0],member[0]);
+    strcpy( teams[team_counter].member[1],member[1]);
+    strcpy( teams[team_counter].member[2],member[2]);
+    print_team_name(team_counter);
 }
 
 time_t dateTimeFormatter(char date[10], char time[5])

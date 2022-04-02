@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include "team.c"
 
 void PrintMenu(){
