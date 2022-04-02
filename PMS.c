@@ -87,8 +87,7 @@ int main(){
             char file_name[40];
 
             // ask for file_name
-            printf("For %s, ", choice);
-            fgets(file_name,40,stdin);
+            scanf("For 2b, %s", &file_name);
 
             file = fopen(file_name, "r");
 
