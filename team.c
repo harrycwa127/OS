@@ -53,7 +53,13 @@ void print_team(int i){
 }
 
 void create_team(char team_detail[6][50]){
-    int i, j, n = 0;
+    int i, j, k, l, n = 0;
+    for(i=0;i<team_size;i++){
+        if(strcmp(team_detail[0], teams[i].team_name)==0 && strcmp(team_detail[1], teams[i].project_name)==0){
+            printf("Error: same team name with same project name existed\n", team_detail[0], team_detail[1]);
+            return;
+        }
+    }
     while(1){
         if(teams[team_size].team_id == -1){
             teams[team_size].team_id = team_size;
@@ -61,8 +67,25 @@ void create_team(char team_detail[6][50]){
             strcpy(teams[team_size].project_name, team_detail[1]);
             for(i=2;i<6;i++){
                 if(strcmp(team_detail[i], "")==0){
-                    printf("empty\n");
+                    break;
                 }else{
+                    for(k=0;k<team_size;k++)
+                        if(strcmp(team_detail[2], teams[k].member[0])==0){
+                            printf("Error: %s already is the manager of %s\n",team_detail[2], teams[k].team_name);
+                            return;
+                        }
+                    
+                    int counter = 0;
+                    for(k=0;k<team_size;k++)
+                        for(l=0;l<teams[k].numOfMember;l++)
+                            if(strcmp(team_detail[i], teams[k].member[l])==0){
+                                counter++;
+                                if(counter==3){
+                                    printf("Error: %s already participate in three projects\n",team_detail[i]);
+                                    return;
+                                }
+                            }
+                    
                     n++;
                     for(j=0; j<50;j++){
                         if(team_detail[i][j] == '\n')
