@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
-#include <string.h>
 
 #define team_size 1000
 
@@ -43,40 +42,20 @@ void print_team_name(int i){
     printf("member %s\n", teams[i].member[2]);
 }
 
-void create_team(char team_name[50], char project_name[50], char manager[50], char member[3][50]){
-    int i;
+void create_team(char team_detail[6][50]){
+    int i, j;
     for(i=0;i<sizeof(teams);i++)
         if(teams[i].team_id == -1){
             teams[i].team_id = i;
-            strcpy(teams[i].team_name, team_name);
-            strcpy(teams[i].project_name, project_name);
-            strcpy(teams[i].manager, manager);
-            strcpy(teams[i].member[0], member[0]);
-            strcpy(teams[i].member[1], member[1]);
-            strcpy(teams[i].member[2], member[2]);
-            // print_team_name(i);
-            printf("Project Team %s is created.\n", team_name);
+            strcpy(teams[i].team_name, team_detail[0]);
+            strcpy(teams[i].project_name, team_detail[1]);
+            strcpy(teams[i].manager, team_detail[2]);
+            for(j=3;j<6;j++)
+                strcpy(teams[i].member[j-3], team_detail[j]);
+            //print_team_name(i);
+            printf("Project Team %s is created.\n", teams[i].team_name);
             break;
         }
-}
-
-struct Team teams[1000];
-int team_counter = 0;
-
-void print_team_name(int i){
-    printf(">>>>>> Project Team %s is created\n", teams[i].team_name);
-}
-
-void create_team(char team_name[100], char project_name[100], char manager[100], char member[3][50]){
-
-    teams[team_counter].team_id = team_counter;
-    strcpy( teams[team_counter].team_name,team_name);
-    strcpy( teams[team_counter].project_name,project_name);
-    strcpy( teams[team_counter].manager,manager);
-    strcpy( teams[team_counter].member[0],member[0]);
-    strcpy( teams[team_counter].member[1],member[1]);
-    strcpy( teams[team_counter].member[2],member[2]);
-    print_team_name(team_counter);
 }
 
 time_t dateTimeFormatter(char date[10], char time[5])

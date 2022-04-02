@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "team.c"
 
 void PrintMenu(){
@@ -25,19 +26,30 @@ int main(){
         if (strcmp(choice, "0") == 0){
 
         }else if (strcmp(choice, "1") == 0){
-            printf("choice %s\n", choice);      //debug use
+            printf("choice %s\n", choice);
             while(1){
-                char team_name[50], project_name[50], manager[50], member[3][50];
+                char input[305];
+                char temp;
                 printf("Enter> ");
-                scanf("%s", team_name);
-                if (strcmp(team_name, "0") == 0) break;
-                scanf("%s", project_name);
-                scanf("%s", manager);
-                scanf("%s", member[0]);
-                scanf("%s", member[1]);
-                scanf("%s", member[2]);
-                // printf("%s %s %s %s %s %s\n", team_name, project_name, manager, member[0], member[1], member[2]);
-                create_team(team_name, project_name, manager, member);
+                scanf("%c", &temp);
+                fgets(input,305,stdin);
+                char *ptr = strtok(input, " ");
+                char storage[6][50];
+                int i, j;
+                for(i=0;i<6;i++){ strcpy(storage[i], "");}
+                for(i=0;i<6;i++){
+                    strcpy(storage[i], ptr);
+		            ptr = strtok(NULL, " ");
+                    if(ptr == NULL) break;
+                }
+                for(i=3;i<6;i++){
+                    if(strcmp(storage[i], "\0") == 0){
+                        storage[i-1][strlen(storage[i-1]) - 1] = '\0';
+                        break;
+                    }
+                }
+                create_team(storage);
+                break;
             }
         }else if (strcmp(choice, "2a") == 0){
             printf("choice %s\n", choice);      //debug use
