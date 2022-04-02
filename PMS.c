@@ -81,10 +81,16 @@ int main(){
             }
         }else if (strcmp(choice, "2b") == 0){
             FILE* file;
-            char * line = NULL;
+            char* line = NULL;
             size_t len = 0;
             ssize_t read;
-            file = fopen("/etc/motd", "r");
+            char file_name[40];
+
+            // ask for file_name
+            printf("For %s, ", choice);
+            fgets(file_name,40,stdin);
+
+            file = fopen(file_name, "r");
 
             // check file
             if (file == NULL) exit(EXIT_FAILURE);
