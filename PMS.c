@@ -26,20 +26,20 @@ int main(){
         if (strcmp(choice, "0") == 0){
 
         }else if (strcmp(choice, "1") == 0){
-            printf("choice %s\n", choice);
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
             while(1){
                 char input[305];
-                char temp;
                 printf("Enter> ");
-                scanf("%c", &temp);
                 fgets(input,305,stdin);
+                if(input[0] == '0') break;
                 char *ptr = strtok(input, " ");
                 char storage[6][50];
-                int i, j;
+                int i;
                 for(i=0;i<6;i++){ strcpy(storage[i], "");}
                 for(i=0;i<6;i++){
                     strcpy(storage[i], ptr);
-		            ptr = strtok(NULL, " ");
+                    ptr = strtok(NULL, " ");
                     if(ptr == NULL) break;
                 }
                 for(i=3;i<6;i++){
@@ -49,10 +49,36 @@ int main(){
                     }
                 }
                 create_team(storage);
-                break;
             }
         }else if (strcmp(choice, "2a") == 0){
-            printf("choice %s\n", choice);      //debug use
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
+            while(1){
+                char input[70];
+                printf("For %s, ", choice);
+                fgets(input,70,stdin);
+                if(input[0] == '0') break;
+                char *ptr = strtok(input, " ");
+                char storage[4][50];
+                int i;
+                for(i=0;i<4;i++){ strcpy(storage[i], "");}
+                for(i=0;i<4;i++){
+                    strcpy(storage[i], ptr);
+                    ptr = strtok(NULL, " ");
+                    if(ptr == NULL) break;
+                }
+                if(strlen(storage[1]) == 10 && strlen(storage[2]) == 5){
+                    char date[11];
+                    char time[6];
+                    strcpy(date, storage[1]);
+                    strcpy(time, storage[2]);
+                    date[10] = '\0';
+                    time[5] = '\0';
+                    project_booking(storage[0], date, time,atoi(storage[3]));
+                }else{
+                    printf("Unaccepted input, please input the correct input.\n");
+                }
+            }
         }else if (strcmp(choice, "2b") == 0){
             printf("choice %s\n", choice);      //debug use
         }else if (strcmp(choice, "2c") == 0){

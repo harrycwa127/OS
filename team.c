@@ -3,74 +3,160 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define team_size 1000
+#define team_max 1000
 
 struct Team{
     int team_id;
     char team_name[50];
     char project_name[50];
-    char manager[50];
-    char member[3][50];
-    time_t dateTime;
-    float duration;
+    char member[4][50];
+    char date[11];
+    char time[6];
+    int duration;
+    int numOfMember;
 } Team;
 
-struct Team teams[team_size];
+struct Team teams[team_max];
+int team_size = 0;
 
 void Team_Init(){
     int i;
-    for(i=0;i<team_size;i++){
+    for(i=0;i<team_max;i++){
         teams[i].team_id = -1;
         strcpy(teams[i].team_name, "");
         strcpy(teams[i].project_name, "");
-        strcpy(teams[i].manager, "");
         strcpy(teams[i].member[0], "");
         strcpy(teams[i].member[1], "");
         strcpy(teams[i].member[2], "");
-        teams[i].dateTime = 0;
+        strcpy(teams[i].member[3], "");
+        strcpy(teams[i].date, "");
+        strcpy(teams[i].time, "");
         teams[i].duration = -1;
+        teams[i].numOfMember = -1;
     }
 }
 
-void print_team_name(int i){
+void print_team(int i){
+    int j;
+    printf("=========================================\n");
     printf("team id %d\n", teams[i].team_id);
     printf("team_name %s\n", teams[i].team_name);
     printf("project_name %s\n", teams[i].project_name);
-    printf("manager %s\n", teams[i].manager);
-    printf("member %s\n", teams[i].member[0]);
-    printf("member %s\n", teams[i].member[1]);
-    printf("member %s\n", teams[i].member[2]);
+    printf("numOfMember %d\n", teams[i].numOfMember);
+    printf("manager %s\n", teams[i].member[0]);
+    for(j=1;j<teams[i].numOfMember;j++)
+        printf("member %s\n", teams[i].member[j]);
+    printf("date %s\n", teams[i].date);
+    printf("time %s\n", teams[i].time);
+    printf("duration %d\n", teams[i].duration);
+    printf("=========================================\n");
 }
 
 void create_team(char team_detail[6][50]){
-    int i, j;
-    for(i=0;i<sizeof(teams);i++)
-        if(teams[i].team_id == -1){
-            teams[i].team_id = i;
-            strcpy(teams[i].team_name, team_detail[0]);
-            strcpy(teams[i].project_name, team_detail[1]);
-            strcpy(teams[i].manager, team_detail[2]);
-            for(j=3;j<6;j++)
-                strcpy(teams[i].member[j-3], team_detail[j]);
-            //print_team_name(i);
-            printf("Project Team %s is created.\n", teams[i].team_name);
+    int i, j, n = 0;
+    while(1){
+        if(teams[team_size].team_id == -1){
+            teams[team_size].team_id = team_size;
+            strcpy(teams[team_size].team_name, team_detail[0]);
+            strcpy(teams[team_size].project_name, team_detail[1]);
+            for(i=2;i<6;i++){
+                if(strcmp(team_detail[i], "")==0){
+                    printf("empty\n");
+                }else{
+                    n++;
+                    for(j=0; j<50;j++){
+                        if(team_detail[i][j] == '\n')
+                            team_detail[i][j] = '\0';
+                    }
+                    strcpy(teams[team_size].member[i-2], team_detail[i]);
+                }
+            }
+            teams[team_size].numOfMember = n;
+            print_team(team_size);
+            printf("Project Team %s is created.\n", teams[team_size].team_name);
+            team_size += 1;
             break;
+        }else{
+            team_size += 1;
         }
+    }
 }
 
-time_t dateTimeFormatter(char date[10], char time[5])
-{
-    int year = 0, month = 0, day = 0, hour = 0, min = 0;
-    time_t dateTime = 0;
-    if (sscanf(date, "%4d-%2d-%2d", &year, &month, &day) == 3 && sscanf(time, "%2d:%2d", &hour, &min) == 2){
-        struct tm t = {0};
-        t.tm_year = year - 1900; /* years since 1900 */
-        t.tm_mon = month - 1;
-        t.tm_mday = day;
-        t.tm_hour = hour;
-        t.tm_min = min;
-        if ((dateTime = mktime(&t)) == (time_t)-1) 
-            printf("Could not convert time input to time_t\n");
-    } else printf("The input was not a valid time format\n");
-    return dateTime;
+void project_booking(char team_name[50], char date[11], char time[6], int duration){
+    char stryear[4];
+    char strmonth[2];
+    char strday[2];
+    char strhour[2];
+    char strmin[2];
+    strncpy(stryear, &date[0], 4);
+    strncpy(strmonth, &date[5], 2);
+    strncpy(strday, &date[8], 2);
+    strncpy(strhour, &time[0], 2);
+    strncpy(strmin, &time[3], 2);
+    int year;
+    int month;
+    int day;
+    int hour;
+    int min;
+    year = atoi(stryear);
+    month = atoi(strmonth);
+    day = atoi(strday);
+    hour = atoi(strhour);
+    min = atoi(strmin);
+    int error = 0;
+    if(month == 4){
+        if(day < 25 || day > 30) error = 1;
+    }else if (month == 5){
+        if(day < 1 || day > 14) error = 1;
+    }else{
+        error = 1;
+    }
+    if (error){
+        printf("Rejected due to assumptions 3\n");
+        return;
+    }
+    if(month == 4 && day == 30) error = 1;
+    if(month == 5 && day == 7) error = 1;
+    if(month == 5 && day == 14) error = 1;
+    if (error){
+        printf("Rejected due to assumptions 4\n");
+        return;
+    }
+    if(hour*60 < 540 || hour*60+duration*60 > 1080 || min != 0 || duration == 0){ // assumptions 5
+        printf("Rejected due to assumptions 5\n");
+        return;
+    }
+    if(duration > 5){
+        printf("Rejected due to time limit exceeded\n");
+        return;
+    }
+    int tid, i, j, k;
+    for(tid=0;tid<team_size+1;tid++) if(strcmp(teams[tid].team_name, team_name)==0) break;
+    int accept = 1;
+    for(i=0;i<team_size+1;i++){
+        if(i == tid) continue;
+        for(j=0;j<teams[i].numOfMember;j++) // check member time overlap
+            for(k=0;k<teams[tid].numOfMember;k++)
+                if(strcmp(teams[i].member[j], teams[tid].member[k])==0){
+                    if(strcmp(teams[i].date, date)==0){ // check overlap
+                        strncpy(strhour, &teams[i].time[0], 2);
+                        int Ahour = atoi(strhour);
+                        int StartA = Ahour * 60; 
+                        int EndA = Ahour * 60 + teams[i].duration * 60;
+                        int StartB = hour * 60;
+                        int EndB = hour * 60 + duration * 60;
+                        if (StartA < EndB && EndA > StartB){
+                            printf("Rejected due to time overlap\n");
+                            return;
+                        }
+                    }
+                }
+    }
+    if(accept == 1){ // no overlap
+        printf("Accepted!\n");
+        strcpy(teams[tid].date, date);
+        strcpy(teams[tid].time, time);
+        teams[tid].duration = duration;
+        print_team(tid);
+    }
 }
