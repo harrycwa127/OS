@@ -23,32 +23,34 @@ int main(){
         PrintMenu();
         printf("  Enter an option: ");
         scanf("%s", choice);
-        if (strcmp(choice, "0") == 0){
-
-        }else if (strcmp(choice, "1") == 0){
+        if (strcmp(choice, "0") == 0){}
+        else if (strcmp(choice, "1") == 0){
             int c;
             while ((c = getchar()) != '\n' && c != EOF);
             while(1){
-                char input[305];
+                char input[606];
                 printf("Enter> ");
                 fgets(input,305,stdin);
                 if(input[0] == '0') break;
                 char *ptr = strtok(input, " ");
-                char storage[6][50];
+                char storage[7][100];
                 int i;
-                for(i=0;i<6;i++){ strcpy(storage[i], "");}
-                for(i=0;i<6;i++){
+                for(i=0;i<7;i++){ strcpy(storage[i], "");}
+                for(i=0;i<7;i++){
                     strcpy(storage[i], ptr);
                     ptr = strtok(NULL, " ");
                     if(ptr == NULL) break;
                 }
-                for(i=3;i<6;i++){
-                    if(strcmp(storage[i], "\0") == 0){
-                        storage[i-1][strlen(storage[i-1]) - 1] = '\0';
-                        break;
-                    }
+                if(strcmp(storage[6], "") != 0){
+                    printf("Error: Too many parameter\n");
+                }else{
+                    for(i=3;i<6;i++)
+                        if(strcmp(storage[i], "\0") == 0){
+                            storage[i-1][strlen(storage[i-1]) - 1] = '\0';
+                            break;
+                        }
+                    create_team(storage);
                 }
-                create_team(storage);
             }
         }else if (strcmp(choice, "2a") == 0){
             int c;
@@ -90,7 +92,7 @@ int main(){
         } else if (strcmp(choice, "3c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "4") == 0){
-            printf("choice %s\n", choice);      //debug use
+            printf("bye\n");
             break;
         } else{ printf("Unaccepted input, please input the correct input.\n"); }
     }   
