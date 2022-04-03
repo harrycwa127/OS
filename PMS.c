@@ -35,12 +35,14 @@ int main(){
                 char *ptr = strtok(input, " ");
                 char storage[7][100];
                 int i;
+                //splite input
                 for(i=0;i<7;i++){ strcpy(storage[i], "");}
                 for(i=0;i<7;i++){
                     strcpy(storage[i], ptr);
                     ptr = strtok(NULL, " ");
                     if(ptr == NULL) break;
                 }
+                //if more than 6 parameter
                 if(strcmp(storage[6], "") != 0){
                     printf("Error: Too many parameter\n");
                 }else{
