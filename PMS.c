@@ -82,7 +82,68 @@ int main(){
                 }
             }
         }else if (strcmp(choice, "2b") == 0){
-            printf("choice %s\n", choice);      //debug use
+            FILE* file;
+            char* line = NULL;
+            ssize_t read;
+            char file_name[40];
+
+            // ask for file_name
+            printf("For %s, ", choice);
+            scanf("%s", &file_name);
+            printf("Filename: %s\n", file_name);
+            file = fopen(file_name, "r");
+
+            // check file
+            if (file == NULL) exit(EXIT_FAILURE);
+
+            char buffer[200];
+            // int lineNum = 0;
+            while(fgets(buffer, 200, file)!=NULL)
+            {                
+                // lineNum+=1;
+                // printf("Content: %s in line %d\n", buffer,lineNum);
+
+                // if(buffer[0] == '0') break;
+                char *ptr = strtok(buffer, " ");
+                char storage[4][50];
+                int i;
+                
+                for(i=0;i<4;i++){
+                    strcpy(storage[i], ptr);
+                    ptr = strtok(NULL, " ");
+                    if(ptr == NULL) break;
+                }
+
+                // Start booking
+                if(strlen(storage[1]) == 10 && strlen(storage[2]) == 5){
+                    char date[11];
+                    char time[6];
+                    strcpy(date, storage[1]);
+                    strcpy(time, storage[2]);
+                    date[10] = '\0';
+                    time[5] = '\0';
+                    project_booking(storage[0], date, time,atoi(storage[3]));
+                }else{
+                    printf("Unaccepted input, please input the correct input.\n");
+                }
+            }
+            
+
+
+            //close file after read done
+            fclose(file);
+            if (line) free(line);
+
+            char input[70];
+            printf("Enter 0 to back to main menu ");
+            while (1)
+            {
+                fgets(input,70,stdin);
+                if(input[0] == '0') break;
+            }
+            
+            
+                
         }else if (strcmp(choice, "2c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "3a") == 0){
