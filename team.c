@@ -97,7 +97,7 @@ void create_team(char team_detail[7][100]){
                     n++;
                 }
             }
-            if(n<1){
+            if(n<2){
                 printf("Error: No manager in the team\n");
                 return;
             }
