@@ -10,17 +10,15 @@ struct Team{
     char team_name[100];     // team name
     char project_name[100];  // project name
     char member[4][50];     // 0 index will be the Manager
-    char date[11];          // example: 2022-04-25\0
-    char time[6];           // example: 09:00\0
-    int duration;
     int numOfMember;        // for the member array
 } Team;
 
 struct Team teams[team_max];
 int team_size = 0;
+int calendar[18][9];
 
 void Team_Init(){
-    int i;
+    int i, j;
     for(i=0;i<team_max;i++){
         teams[i].team_id = -1;              // default value
         strcpy(teams[i].team_name, "");     // empty name
@@ -29,11 +27,9 @@ void Team_Init(){
         strcpy(teams[i].member[1], "");     // empty name
         strcpy(teams[i].member[2], "");     // empty name
         strcpy(teams[i].member[3], "");     // empty name
-        strcpy(teams[i].date, "");          // empty date
-        strcpy(teams[i].time, "");          // empty time
-        teams[i].duration = -1;
         teams[i].numOfMember = -1;
     }
+    for(i=0;i<18;i++) for(j=0;j<9;j++) calendar[i][j]=-1;
 }
 
 void print_team(int i){  // debug use
@@ -46,12 +42,28 @@ void print_team(int i){  // debug use
     printf("manager \t%s\n", teams[i].member[0]);
     for(j=1;j<teams[i].numOfMember;j++)
         printf("member \t\t%s\n", teams[i].member[j]);
-    if(teams[i].duration != -1){
-        printf("date \t%s\n", teams[i].date);
-        printf("time \t%s\n", teams[i].time);
-        printf("duration \t%d\n", teams[i].duration);
-    }else{ printf("date, time, duration not yet been set\n"); }
     printf("========================================\n");
+}
+
+void print_calendar(){
+    int i, j;
+    printf("\\\t");
+    for(j=0;j<9;j++){
+        int num = j+9;
+        printf("%d-%d\t", num, num+1);
+    } printf("\n");
+    for(i=0;i<18;i++){
+        int num = i + 25;
+        if (num > 30){
+            num -= 30;
+            if(num > 0) num++;
+            if(num > 7) num++;
+        }
+        printf("%d\t", num);
+        for(j=0;j<9;j++){
+            printf("%d\t", calendar[i][j]);
+        } printf("\n");
+    }
 }
 
 void create_team(char team_detail[7][100]){
@@ -128,23 +140,19 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     strncpy(strday, &date[8], 2);       // substring
     strncpy(strhour, &time[0], 2);      // substring
     strncpy(strmin, &time[3], 2);       // substring
-    int year;
-    int month;
-    int day;
-    int hour;
-    int min;
-    year = atoi(stryear);               // string to int
-    month = atoi(strmonth);             // string to int
-    day = atoi(strday);                 // string to int
-    hour = atoi(strhour);               // string to int
-    min = atoi(strmin);                 // string to int
-    
+    int year = atoi(stryear);           // string to int
+    int month = atoi(strmonth);         // string to int
+    int day = atoi(strday);             // string to int
+    int hour = atoi(strhour);           // string to int
+    int min = atoi(strmin);             // string to int
 
+    // error checking
     int error = 0;
+    if(year != 2022) error = 1;
     if(month == 4){
-        if(day < 25 || day > 30) error = 1;
+        if(25 > day || day > 30) error = 1;
     }else if (month == 5){
-        if(day < 1 || day > 14) error = 1;
+        if(1 > day || day > 14) error = 1;
     }else{
         error = 1;
     }
@@ -152,9 +160,8 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         printf("Rejected due to assumptions 3\n");
         return;
     }
-    if(month == 4 && day == 30) error = 1;
-    if(month == 5 && day == 7) error = 1;
-    if(month == 5 && day == 14) error = 1;
+    if(month == 5 && day == 1) error = 1;
+    if(month == 5 && day == 8) error = 1;
     if (error){
         printf("Rejected due to assumptions 4\n");
         return;
@@ -167,33 +174,36 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         printf("Rejected due to time limit exceeded\n");
         return;
     }
-    int tid, i, j, k;
-    for(tid=0;tid<team_size+1;tid++) if(strcmp(teams[tid].team_name, team_name)==0) break;
-    int accept = 1;
-    for(i=0;i<team_size+1;i++){ // loop for all the teams
-        if(i == tid) continue;  // skip same team id
-        for(j=0;j<teams[i].numOfMember;j++) // loop for all member in team
-            for(k=0;k<teams[tid].numOfMember;k++) // loop for all member in the new booking team
-                if(strcmp(teams[i].member[j], teams[tid].member[k])==0){
-                    if(strcmp(teams[i].date, date)==0){ // check overlap
-                        strncpy(strhour, &teams[i].time[0], 2);
-                        int Ahour = atoi(strhour);
-                        int StartA = Ahour * 60; 
-                        int EndA = Ahour * 60 + teams[i].duration * 60;
-                        int StartB = hour * 60;
-                        int EndB = hour * 60 + duration * 60;
-                        if (StartA < EndB && EndA > StartB){
-                            printf("Rejected due to time overlap\n");
-                            return;
-                        }
-                    }
-                }
+    int day_index;
+    if (month == 4) day_index = day -25;
+    if (month == 5){
+        day_index = day + 5;
+        if(day > 0) day_index --;
+        if(day > 6) day_index --;
     }
-    if(accept == 1){ // no overlap
-        printf("Accepted!\n");
-        strcpy(teams[tid].date, date);
-        strcpy(teams[tid].time, time);
-        teams[tid].duration = duration;
-        // print_team(tid);
+    int time_index = hour - 9;
+    int i;
+    int tid = -1;
+    for(i=0; i<team_size;i++){
+        if(strcmp(teams[i].team_name, team_name)==0){
+            tid = i;
+        }
     }
+    if (tid == -1){
+        printf("team name not found!\n");
+        return;
+    }
+    for(i=0; i<duration; i++){
+        if(calendar[day_index][time_index + i] != -1)
+            error = 1;
+    }
+    if (error){
+        printf("Rejected due to time overlap!\n");
+        return;
+    }
+    for(i=0; i<duration; i++){
+        calendar[day_index][time_index + i] = tid;
+    }
+    printf("Accepted!!\n");
+    // print_calendar();
 }
