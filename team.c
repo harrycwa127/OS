@@ -196,9 +196,20 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     for(i=0; i<duration; i++){
         if(calendar[day_index][time_index + i] != -1)
             error = 1;
+            break;
     }
     if (error){
         printf("Rejected due to time overlap!\n");
+        return;
+    }
+    int total_hour = 0;
+    for(i=0; i < 9; i++){
+        if(calendar[day_index][i] == tid)
+            total_hour ++;
+    }
+    printf("Total hours: %d\n", total_hour);
+    if (total_hour + duration > 5){
+        printf("Rejected due to time limit exceeded!\n");
         return;
     }
     for(i=0; i<duration; i++){
