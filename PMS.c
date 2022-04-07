@@ -153,7 +153,7 @@ int main(){
             int fd[6][2];           //for pipe, each week 2 pipes
             char storage[4][50], buffer[200];   //buffer for store data from file
             char time_buf[10];    // buffer for store the substring in datetime
-            int day;    //store int of booking day
+            int day;    //store int of booking 
 
             // init pipe, i*2 for parent to child, 1*2+1 for child to parent
             for(i = 0; i < max_week; i++){
@@ -176,6 +176,7 @@ int main(){
             } else if (pid == 0) { // child
                 int hour;   // store the int of hour
                 int tid;    // store the team_id find from name
+                int day_offset[3] = {-25, 4, 3};
 
                 for(week = 0; week < max_week; week++){    //child for 3 week sechulding
                     if (pid = fork() < 0) {
@@ -228,8 +229,8 @@ int main(){
                         //set clander timeslot to team_id
                         for(i = 0; i < atoi(storage[3]); i++){
                             // check for time slot whether used
-                            if(calendar[day-25][hour-9+i] == -1){
-                                calendar[day-25][hour-9+i] = tid;
+                            if(calendar[day + day_offset[week]][hour-9+i] == -1){
+                                calendar[day + day_offset[week]][hour-9+i] = tid;
                             }
                         }
                     }
