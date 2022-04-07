@@ -222,4 +222,24 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     }
     printf("Accepted!!\n");
     // print_calendar();
+
+    // write the valid book to the .txt
+    char line[100];
+    strcat(team_name, " ");
+    strcat(team_name, date);
+    strcat(team_name, " ");
+    strcat(team_name, time);
+    strcat(team_name, " ");
+    char dur[8];
+    sprintf(dur, "%d", duration);
+    strcat(team_name, dur);
+    strcpy(line, team_name);
+    printf("line: %s\n",line);
+
+    FILE *booking;
+    booking = fopen("booking.txt", "a+");
+    fputs(line, booking);
+    fputs("\n",booking);
+    fclose(booking);
+ 
 }
