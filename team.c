@@ -11,11 +11,11 @@ struct Team{
     char project_name[100];  // project name
     char member[4][50];     // 0 index will be the Manager
     int numOfMember;        // for the member array
+    int calendar[18][9];    // for check booking time overlap
 } Team;
 
 struct Team teams[team_max];
 int team_size = 0;
-int calendar[18][9];
 
 void Team_Init(){
     int i, j;
@@ -28,8 +28,8 @@ void Team_Init(){
         strcpy(teams[i].member[2], "");     // empty name
         strcpy(teams[i].member[3], "");     // empty name
         teams[i].numOfMember = -1;
+        for(i=0;i<18;i++) for(j=0;j<9;j++) teams[i].calendar[i][j]=-1;
     }
-    for(i=0;i<18;i++) for(j=0;j<9;j++) calendar[i][j]=-1;
 }
 
 void print_team(int i){  // debug use
@@ -45,7 +45,7 @@ void print_team(int i){  // debug use
     printf("========================================\n");
 }
 
-void print_calendar(){
+void print_calendar(int tid){
     int i, j;
     printf("\\\t");
     for(j=0;j<9;j++){
@@ -61,7 +61,7 @@ void print_calendar(){
         }
         printf("%d\t", num);
         for(j=0;j<9;j++){
-            printf("%d\t", calendar[i][j]);
+            printf("%d\t", teams[tid].calendar[i][j]);
         } printf("\n");
     }
 }
@@ -194,7 +194,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         return;
     }
     for(i=0; i<duration; i++){
-        if(calendar[day_index][time_index + i] != -1)
+        if(teams[tid].calendar[day_index][time_index + i] != -1)
             error = 1;
             break;
     }
@@ -204,7 +204,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     }
     int total_hour = 0;
     for(i=0; i < 9; i++){
-        if(calendar[day_index][i] == tid)
+        if(teams[tid].calendar[day_index][i] == tid)
             total_hour ++;
     }
     printf("Total hours: %d\n", total_hour);
@@ -213,7 +213,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         return;
     }
     for(i=0; i<duration; i++){
-        calendar[day_index][time_index + i] = tid;
+        teams[tid].calendar[day_index][time_index + i] = tid;
     }
     printf("Accepted!!\n");
     // print_calendar();
