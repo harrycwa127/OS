@@ -153,7 +153,7 @@ int main(){
             int fd[6][2];           //for pipe, each week 2 pipes
             char storage[4][50], buffer[200];   //buffer for store data from file
             char time_buf[10];    // buffer for store the substring in datetime
-            int day;    //store int of booking 
+            int day, tid;    //store int of booking 
 
             // init pipe, i*2 for parent to child, 1*2+1 for child to parent
             for(i = 0; i < max_week; i++){
@@ -175,7 +175,6 @@ int main(){
                 exit(1);
             } else if (pid == 0) { // child
                 int hour;   // store the int of hour
-                int tid;    // store the team_id find from name
                 int day_offset[3] = {-25, 4, 3};
 
                 for(week = 0; week < max_week; week++){    //child for 3 week sechulding
@@ -199,9 +198,20 @@ int main(){
                     }
 
                     while(1){
-                        while(strcmp(buffer, "") && strcmp(buffer, "no-booking")) read(fd[i*2+1][0], buffer, max_buf);  //wait for read and read booking
+                        while(!strcmp(buffer, "")) read(fd[i*2+1][0], buffer, max_buf);  //wait for read and read booking
 
                         if(!strcmp(buffer, "no-booking")){
+                            // return the reuslt to parent
+                            for(i = 0; i < 18; i++){
+                                for(j = 0; j < 9; j++){
+                                    if(calendar[i][j] != -1){
+                                        write(fd[week*2+1][1], sprintf("%d %d %d", i, j, calendar[i][j]), max_buf);
+                                    }
+                                }
+                            }
+
+                            close(fd[week*2][0]); // close parent to child output
+                            close(fd[week*2+1][1]); // close child to parent intput
                             exit(0);
                         }
 
@@ -239,6 +249,9 @@ int main(){
                 while(wait(NULL) > 0);  //wait for all child finish
             } else {         //parent to sorting all booking and assign to the child
                 FILE *file = fopen("booking.dat", "r");     //to open the booking file
+                //variable for convert message from child to int
+                char temp[50];
+                int date, time;
 
                 for(i = 0; i < max_week; i++){
                     close(fd[i*2][0]); // close parent to child output
@@ -273,6 +286,28 @@ int main(){
                 }
 
                 wait(NULL);
+
+                for(i = 0; i < max_week; i++){
+                    buffer[0] = ' ';   //clear buffer
+                    while(1){
+                        read(fd[i*2+1][0], buffer, max_buf);
+                        if(!strcmp(buffer, "")) break;  //check if pipe is null then break
+
+                        //get date
+                        strcpy(temp, strtok(buffer, " "));
+                        date = atoi(temp);
+
+                        //get time
+                        strcpy(temp, strtok(NULL, " "));
+                        time = atoi(temp);
+
+                        //get tid
+                        strcpy(temp, strtok(NULL, " "));
+                        tid = atoi(temp);
+
+                        calendar[date][time] = tid;
+                    }
+                }
             }
             
         } else if (strcmp(choice, "3b") == 0){
