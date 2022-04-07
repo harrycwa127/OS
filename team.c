@@ -18,7 +18,7 @@ struct Team teams[team_max];
 int team_size = 0;
 
 void Team_Init(){
-    int i, j;
+    int i, j, k;
     for(i=0;i<team_max;i++){
         teams[i].team_id = -1;              // default value
         strcpy(teams[i].team_name, "");     // empty name
@@ -28,7 +28,12 @@ void Team_Init(){
         strcpy(teams[i].member[2], "");     // empty name
         strcpy(teams[i].member[3], "");     // empty name
         teams[i].numOfMember = -1;
-        for(i=0;i<18;i++) for(j=0;j<9;j++) teams[i].calendar[i][j]=-1;
+        // init calendar
+        for(j=0;j<18;j++){
+            for(k=0;k<9;k++){
+                teams[i].calendar[i][j]=-1; 
+            }
+        }  
     }
 }
 
