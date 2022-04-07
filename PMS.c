@@ -279,6 +279,11 @@ int main(){
         } else if (strcmp(choice, "3c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "4") == 0){
+            // delete the booking.txt           
+            if (remove("booking.txt")==0){
+                printf("booking.txt removed!\n");
+            }
+            
             printf("bye\n");
             break;
         } else{ printf("Unaccepted input, please input the correct input.\n"); }
