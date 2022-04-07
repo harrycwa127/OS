@@ -31,7 +31,7 @@ void Team_Init(){
         // init calendar
         for(j=0;j<18;j++){
             for(k=0;k<9;k++){
-                teams[i].calendar[i][j]=-1; 
+                teams[i].calendar[j][k]=-1; 
             }
         }  
     }
