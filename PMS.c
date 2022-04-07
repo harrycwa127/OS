@@ -85,8 +85,6 @@ int main(){
             }
         }else if (strcmp(choice, "2b") == 0){
             FILE* file;
-            char* line = NULL;
-            ssize_t read;
             char file_name[40];
 
             // ask for file_name
@@ -102,10 +100,7 @@ int main(){
             // int lineNum = 0;
             while(fgets(buffer, 200, file)!=NULL)
             {                
-                // lineNum+=1;
-                // printf("Content: %s in line %d\n", buffer,lineNum);
 
-                // if(buffer[0] == '0') break;
                 char *ptr = strtok(buffer, " ");
                 char storage[4][50];
                 int i;
@@ -134,7 +129,6 @@ int main(){
 
             //close file after read done
             fclose(file);
-            if (line) free(line);
 
             char input[70];
             printf("Enter 0 to back to main menu ");
@@ -149,7 +143,63 @@ int main(){
         }else if (strcmp(choice, "2c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "3a") == 0){
-            printf("choice %s\n", choice);      //debug use
+            static int week_num = 3;// max week
+            int booking_count;      //for counting the numbers of booking
+            int calendar[18][9];    // for check all teambooking time overlap
+            int pid, mypid, week, i, j, k;  // comment var for child to use, and be counter
+            int fd[6][2];           //for pipe, each week 2 pipes
+
+            // init pipe, i*2 for parent to child, 1*2+1 for child to parent
+            for(i = 0; i < week_num; i++){
+                if (pipe(fd[i*2]) < 0 || pipe(fd[i*2+1]) < 0 ) {
+                    printf("Pipe creation error\n");
+                    exit(1);
+                }
+            }
+
+            if (pid = fork() < 0) {
+                printf("Fork failed\n");
+                exit(1);
+            } else if (pid == 0) { // child
+                for(week = 0; week < week_num; week++){    //child for 3 week sechulding
+                    if (pid = fork() < 0) {
+                        printf("Fork failed\n");
+                        exit(1);
+
+                    } else if (pid == 0) { // child
+
+                        //close unused pipe
+                        close(fd[week*2][1]); // close parent to child input
+                        close(fd[week*2+1][0]); // close child to parent output
+                        for(i=0; i < week_num; i++){
+                            if(i != week){
+                                close(fd[i*2][0]);
+                                close(fd[i*2][1]);
+                                close(fd[i*2+1][0]);
+                                close(fd[i*2+1][1]);
+                            }
+                        }
+
+                    }
+                }
+
+                while(wait(NULL) > 0);  //wait for all child finish
+            } else {                                //parent to sorting all booking and assign to the child
+                FILE *file = fopen("booking.dat", "r");     //to open the booking file
+                char storage[4][50], buffer[200];   //buffer for store data from file
+
+                //read file line by line
+                while(fgets(buffer, 200, file)!=NULL){
+                    strcpy(storage[0], strtok(buffer, " "));
+                    for(i = 1 ; i < 4; i++){
+                        strcpy(storage[i], strtok(NULL, " "));
+                    }
+                }
+
+
+                wait(NULL);
+            }
+            
         } else if (strcmp(choice, "3b") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "3c") == 0){
