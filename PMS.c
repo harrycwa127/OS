@@ -144,15 +144,15 @@ int main(){
         }else if (strcmp(choice, "2c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "3a") == 0){
-            static int max_week = 3;// max week
-            static int max_buf = 50;// max length of buffer
+            static int max_week = 3;    // max week
+            static int max_buf = 200;   // max length of buffer
 
             int booking_count;      //for counting the numbers of booking
             int calendar[18][9];    // for check all teambooking time overlap
-            int pid, week, i, j;  // comment var for child to use, and be counter
+            int pid, week, i, j;    // comment var for child to use, and be counter
             int fd[6][2];           //for pipe, each week 2 pipes
             char storage[4][50], buffer[200];   //buffer for store data from file
-            char time_buf[10];    // buffer for store the substring in datetime
+            char time_buf[10];      // buffer for store the substring in datetime
             int day, tid;    //store int of booking 
 
             // init pipe, i*2 for parent to child, 1*2+1 for child to parent
@@ -168,17 +168,18 @@ int main(){
                 for(j=0;j<9;j++){
                     calendar[i][j] = -1; 
                 }
-            }  
-
-            if (pid = fork() < 0) {
+            }
+            pid = fork();
+            if (pid < 0) {
                 printf("Fork failed\n");
                 exit(1);
             } else if (pid == 0) { // child
                 int hour;   // store the int of hour
-                int day_offset[3] = {-25, 4, 3};
+                int day_offset[] = {-25, 4, 3};
 
                 for(week = 0; week < max_week; week++){    //child for 3 week sechulding
-                    if (pid = fork() < 0) {
+                    pid = fork();
+                    if (pid < 0) {
                         printf("Fork failed\n");
                         exit(1);
 
@@ -195,62 +196,70 @@ int main(){
                                 close(fd[i*2+1][1]);
                             }
                         }
-                    }
 
-                    while(1){
-                        while(!strcmp(buffer, "")) read(fd[i*2+1][0], buffer, max_buf);  //wait for read and read booking
+                        while(1){
 
-                        if(!strcmp(buffer, "no-booking")){
-                            // return the reuslt to parent
-                            for(i = 0; i < 18; i++){
-                                for(j = 0; j < 9; j++){
-                                    if(calendar[i][j] != -1){
-                                        write(fd[week*2+1][1], sprintf("%d %d %d", i, j, calendar[i][j]), max_buf);
+                            while(strcmp(buffer, "") == 0) read(fd[week*2][0], buffer, max_buf);  //wait for read and read booking
+                            printf("%s\n", buffer);
+
+                            if(!strcmp(buffer, "no-booking")){
+                                // return the reuslt to parent
+                                for(i = 0; i < 18; i++){
+                                    for(j = 0; j < 9; j++){
+                                        if(calendar[i][j] != -1){
+                                            sprintf(buffer, "%d %d %d", i, j, calendar[i][j]);
+                                            write(fd[week*2+1][1], buffer, max_buf);
+                                        }
                                     }
                                 }
+
+                                close(fd[week*2][0]); // close parent to child output
+                                close(fd[week*2+1][1]); // close child to parent intput
+                                exit(0);
                             }
 
-                            close(fd[week*2][0]); // close parent to child output
-                            close(fd[week*2+1][1]); // close child to parent intput
-                            exit(0);
-                        }
+                            strcpy(storage[0], strtok(buffer, " "));
 
-                        for(i = 1 ; i < 4; i++){
-                            strcpy(storage[i], strtok(NULL, " "));
-                        }
-
-                        //get the  and hour for compare
-                        strncpy(time_buf, &storage[1][8], 2);       // substring
-                        day = atoi(time_buf);
-                        strncpy(time_buf, &storage[2][0], 2);       // substring
-                        hour = atoi(time_buf);           // string to int
-
-                        tid = -1;
-                        for(i=0; i<team_size;i++){
-                            if(strcmp(teams[i].team_name, storage[0])==0){
-                                tid = i;
+                            for(i = 1 ; i < 4; i++){
+                                strcpy(storage[i], strtok(NULL, " "));
                             }
-                        }
-                        if (tid == -1){
-                            printf("team name not found!\n");
-                            return;
-                        }
 
-                        //set clander timeslot to team_id
-                        for(i = 0; i < atoi(storage[3]); i++){
-                            // check for time slot whether used
-                            if(calendar[day + day_offset[week]][hour-9+i] == -1){
-                                calendar[day + day_offset[week]][hour-9+i] = tid;
+
+                            //get the  and hour for compare
+                            strncpy(time_buf, &storage[1][8], 2);       // substring
+                            day = atoi(time_buf);
+                            strncpy(time_buf, &storage[2][0], 2);       // substring
+                            hour = atoi(time_buf);           // string to int
+
+                            tid = -1;
+                            for(i=0; i<team_size;i++){
+                                if(strcmp(teams[i].team_name, storage[0])==0){
+                                    tid = i;
+                                }
+                            }
+                            if (tid == -1){
+                                printf("team name not found!\n");
+                                return;
+                            }
+
+
+                            //set clander timeslot to team_id
+                            for(i = 0; i < atoi(storage[3]); i++){
+                                // check for time slot whether used
+                                if(calendar[day + day_offset[week]][hour-9+i] == -1){
+                                    calendar[day + day_offset[week]][hour-9+i] = tid;
+                                }
                             }
                         }
                     }
                 }
 
                 while(wait(NULL) > 0);  //wait for all child finish
+
             } else {         //parent to sorting all booking and assign to the child
                 FILE *file = fopen("booking.dat", "r");     //to open the booking file
                 //variable for convert message from child to int
-                char temp[50];
+                char temp[200];
                 int date, time;
 
                 for(i = 0; i < max_week; i++){
@@ -259,14 +268,16 @@ int main(){
                 }
 
                 //read file line by line
-                while(fgets(buffer, 200, file)!=NULL){
-                    strcpy(storage[0], strtok(buffer, " "));
+                while(fgets(buffer, max_buf, file)!=NULL){
+                    // temp is copy of for get substring
+                    strcpy(temp, buffer);
+                    strcpy(storage[0], strtok(temp, " "));
                     for(i = 1 ; i < 4; i++){
                         strcpy(storage[i], strtok(NULL, " "));
                     }
 
                     //get the day for compare
-                    strncpy(time_buf, &storage[2][8], 2);       // substring
+                    strncpy(time_buf, &storage[1][8], 2);       // substring
                     day = atoi(time_buf);
 
                     //check for week
@@ -288,7 +299,7 @@ int main(){
                 wait(NULL);
 
                 for(i = 0; i < max_week; i++){
-                    buffer[0] = ' ';   //clear buffer
+                    buffer[0] = '\0';   //clear buffer
                     while(1){
                         read(fd[i*2+1][0], buffer, max_buf);
                         if(!strcmp(buffer, "")) break;  //check if pipe is null then break
