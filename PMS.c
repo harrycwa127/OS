@@ -147,7 +147,7 @@ int main(){
             schedule_FIFC();
             
         } else if (strcmp(choice, "3b") == 0){
-            printf("choice %s\n", choice);      //debug use
+            schedule_Priority();
         } else if (strcmp(choice, "3c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "4") == 0){
