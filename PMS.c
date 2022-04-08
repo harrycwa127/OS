@@ -152,8 +152,8 @@ int main(){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "4") == 0){
             // delete the booking.txt           
-            if (remove("booking.txt")==0){
-                printf("booking.txt removed!\n");
+            if (remove("booking.txt") == 0 && remove("sorted.dat") == 0){
+                printf("booking.txt and sorted removed!\n");
             }
             
             printf("bye\n");
