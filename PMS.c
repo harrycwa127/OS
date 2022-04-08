@@ -125,8 +125,6 @@ int main(){
                     printf("Unaccepted input, please input the correct input.\n");
                 }
             }
-            
-
 
             //close file after read done
             fclose(file);
@@ -138,7 +136,6 @@ int main(){
                 fgets(input,70,stdin);
                 if(input[0] == '0') break;
             }
-            
             
                 
         }else if (strcmp(choice, "2c") == 0){

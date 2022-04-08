@@ -298,10 +298,11 @@ void schedule_FIFC(){
                 }
 
                 while(1){
-
+                    buffer[0] = '\0';
                     while(strcmp(buffer, "") == 0) read(fd[week*2][0], buffer, max_buf);  //wait for read and read booking
 
                     if(!strcmp(buffer, "no-booking")){
+
                         // return the reuslt to parent
                         for(i = 0; i < 18; i++){
                             for(j = 0; j < 9; j++){
@@ -311,6 +312,9 @@ void schedule_FIFC(){
                                 }
                             }
                         }
+
+                        write(fd[week*2+1][1], "end", max_buf);
+                        
 
                         close(fd[week*2][0]); // close parent to child output
                         close(fd[week*2+1][1]); // close child to parent intput
@@ -323,12 +327,11 @@ void schedule_FIFC(){
                         strcpy(storage[i], strtok(NULL, " "));
                     }
 
-
                     //get the  and hour for compare
                     strncpy(time_buf, &storage[1][8], 2);       // substring
-                    day = atoi(time_buf);
+                    day = atoi(time_buf) + day_offset[week];
                     strncpy(time_buf, &storage[2][0], 2);       // substring
-                    hour = atoi(time_buf);           // string to int
+                    hour = atoi(time_buf)-9;           // string to int
 
                     tid = -1;
                     for(i=0; i<team_size;i++){
@@ -341,12 +344,16 @@ void schedule_FIFC(){
                         return;
                     }
 
-
                     //set clander timeslot to team_id
                     for(i = 0; i < atoi(storage[3]); i++){
                         // check for time slot whether used
-                        if(calendar[day + day_offset[week]][hour-9+i] == -1){
-                            calendar[day + day_offset[week]][hour-9+i] = tid;
+                        if(calendar[day][hour+i] == -1){
+                            calendar[day][hour+i] = tid;
+                        }else{
+                            for(j = 0; j < i; j++){
+                                calendar[day][hour+j] = -1;
+                            }
+                            break;
                         }
                     }
                 }
@@ -392,16 +399,16 @@ void schedule_FIFC(){
         }
 
         for(i = 0 ; i < max_week ; i++){
-            write(fd[i*2][1], "no-booking", max_buf);                                 // write the no-booking to all week
+            write(fd[i*2][1], "no-booking", max_buf);                             // write the no-booking to all week
         }
 
-        wait(NULL);
-
         for(i = 0; i < max_week; i++){
-            buffer[0] = '\0';   //clear buffer
             while(1){
-                read(fd[i*2+1][0], buffer, max_buf);
-                if(!strcmp(buffer, "")) break;  //check if pipe is null then break
+                buffer[0] = '\0';   //clear buffer
+                while(!strcmp(buffer, "")) read(fd[i*2+1][0], buffer, max_buf);
+
+                //check end of booking
+                if(!strcmp(buffer, "end")) break;
 
                 //get date
                 strcpy(temp, strtok(buffer, " "));
@@ -418,5 +425,7 @@ void schedule_FIFC(){
                 calendar[date][time] = tid;
             }
         }
+        wait(NULL);
+        return;
     }
 }
