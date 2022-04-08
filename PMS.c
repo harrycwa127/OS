@@ -144,13 +144,13 @@ int main(){
             schedule_FIFC();
             
         } else if (strcmp(choice, "3b") == 0){
-            printf("choice %s\n", choice);      //debug use
+            schedule_Priority();
         } else if (strcmp(choice, "3c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "4") == 0){
             // delete the booking.txt           
-            if (remove("booking.txt")==0){
-                printf("booking.txt removed!\n");
+            if (remove("booking.txt") == 0 && remove("sorted.dat") == 0){
+                printf("booking.txt and sorted removed!\n");
             }
             
             printf("bye\n");
