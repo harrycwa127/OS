@@ -8,8 +8,8 @@
 struct Team
 {
     int team_id;            // default -1
-    char team_name[100];    // team name
-    char project_name[100]; // project name
+    char team_name[50];    // team name
+    char project_name[50]; // project name
     char member[4][50];     // 0 index will be the Manager
     int numOfMember;        // for the member array
     int calendar[18][9];    // for check booking time overlap
@@ -17,6 +17,7 @@ struct Team
 
 struct Team teams[team_max];
 int team_size = 0;
+char calendar[18][9][120]; // used for part 3 to store the info of booking
 
 void Team_Init()
 {
@@ -56,35 +57,35 @@ void print_team(int i)
     printf("========================================\n");
 }
 
-void print_calendar(int tid)
-{
-    int i, j;
-    printf("\\\t");
-    for (j = 0; j < 9; j++)
-    {
-        int num = j + 9;
-        printf("%d-%d\t", num, num + 1);
-    }
-    printf("\n");
-    for (i = 0; i < 18; i++)
-    {
-        int num = i + 25;
-        if (num > 30)
-        {
-            num -= 30;
-            if (num > 0)
-                num++;
-            if (num > 7)
-                num++;
-        }
-        printf("%d\t", num);
-        for (j = 0; j < 9; j++)
-        {
-            printf("%d\t", teams[tid].calendar[i][j]);
-        }
-        printf("\n");
-    }
-}
+// void print_calendar(int tid)
+// {
+//     int i, j;
+//     printf("\\\t");
+//     for (j = 0; j < 9; j++)
+//     {
+//         int num = j + 9;
+//         printf("%d-%d\t", num, num + 1);
+//     }
+//     printf("\n");
+//     for (i = 0; i < 18; i++)
+//     {
+//         int num = i + 25;
+//         if (num > 30)
+//         {
+//             num -= 30;
+//             if (num > 0)
+//                 num++;
+//             if (num > 7)
+//                 num++;
+//         }
+//         printf("%d\t", num);
+//         for (j = 0; j < 9; j++)
+//         {
+//             printf("%d\t", teams[tid].calendar[i][j]);
+//         }
+//         printf("\n");
+//     }
+// }
 
 void create_team(char team_detail[7][100])
 {
@@ -313,22 +314,56 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     fclose(booking);
 }
 
-void schedule_FIFC()
-{
+
+void print_calendar(char *algorithm){
+    printf("*** Project Meeting ***\n\n");
+    printf("Algorithm used: %s\n", algorithm);
+
+    // for check period
+    int period[4] = {-1, -1, -1, -1}, i, j; 
+    for(i = 0; i < 18; i++){
+        for(j = 0; j < 9; j++){
+            if(calendar[i][j][0] != '\0'){
+                // check for start of period
+                if(period[0] == -1 && period[1] == -1){
+                    period[0] = i;
+                    period[1] = j;
+                }
+
+                // check for end of period
+                period[2] = i;
+                period[3] = j;
+            }
+        }
+    }
+    char temp_start[120], temp_end[120];      //temp for copy the info of start and end period
+    strcpy(temp_start, calendar[period[0]][period[1]]);
+    strcpy(temp_end, calendar[period[2]][period[3]]);
+
+    printf("Period: %s to %s\n", strtok(temp_start, "|"), strtok(temp_end, "|"));
+
+    printf("Date\t\tStart\tEnd\t\tTeam\t\tProject\n");
+    printf("============================================================================================");
+
+    // to-do 
+
+    return;
+}
+
+
+void schedule_FCFS(){
     static int max_week = 3;  // max week
     static int max_buf = 200; // max length of buffer
 
     int booking_count;                // for counting the numbers of booking
-    int calendar[18][9];              // for check all teambooking time overlap
     int pid, week, i, j;              // comment var for child to use, and be counter
     int fd[6][2];                     // for pipe, each week 2 pipes
     char storage[4][50], buffer[200]; // buffer for store data from file
-    char time_buf[10];                // buffer for store the substring in datetime
-    int day, tid;                     // store int of booking
+    char time_buf[3];                // buffer for store the substring in datetime
+    int day;                     // store int of booking
 
     // init pipe, i*2 for parent to child, 1*2+1 for child to parent
-    for (i = 0; i < max_week; i++)
-    {
+    for (i = 0; i < max_week; i++){
         if (pipe(fd[i * 2]) < 0 || pipe(fd[i * 2 + 1]) < 0)
         {
             printf("Pipe creation error\n");
@@ -337,11 +372,9 @@ void schedule_FIFC()
     }
 
     // init calendar
-    for (i = 0; i < 18; i++)
-    {
-        for (j = 0; j < 9; j++)
-        {
-            calendar[i][j] = -1;
+    for (i = 0; i < 18; i++){
+        for (j = 0; j < 9; j++){
+            calendar[i][j][0] = '\0';
         }
     }
     pid = fork();
@@ -350,29 +383,24 @@ void schedule_FIFC()
         printf("Fork failed\n");
         exit(1);
     }
-    else if (pid == 0)
-    {             // child
+    else if (pid == 0){             // child
         int hour; // store the int of hour
         int day_offset[] = {-25, 4, 3};
+        char pro_name[50];  //store the project name of team
 
-        for (week = 0; week < max_week; week++)
-        { // child for 3 week sechulding
+        for (week = 0; week < max_week; week++){ // child for 3 week sechulding
             pid = fork();
-            if (pid < 0)
-            {
+            if (pid < 0){
                 printf("Fork failed\n");
                 exit(1);
             }
-            else if (pid == 0)
-            { // child
+            else if (pid == 0){ // child
 
                 // close unused pipe
                 close(fd[week * 2][1]);     // close parent to child input
                 close(fd[week * 2 + 1][0]); // close child to parent output
-                for (i = 0; i < max_week; i++)
-                {
-                    if (i != week)
-                    {
+                for (i = 0; i < max_week; i++){
+                    if (i != week){
                         close(fd[i * 2][0]);
                         close(fd[i * 2][1]);
                         close(fd[i * 2 + 1][0]);
@@ -387,13 +415,10 @@ void schedule_FIFC()
                     if(!strcmp(buffer, "no-booking")){
 
                         // return the reuslt to parent
-                        for (i = 0; i < 18; i++)
-                        {
-                            for (j = 0; j < 9; j++)
-                            {
-                                if (calendar[i][j] != -1)
-                                {
-                                    sprintf(buffer, "%d %d %d", i, j, calendar[i][j]);
+                        for (i = 0; i < 18; i++){
+                            for (j = 0; j < 9; j++){
+                                if (calendar[i][j][0] != '\0'){
+                                    sprintf(buffer, "%d %d %s", i, j, calendar[i][j]);
                                     write(fd[week * 2 + 1][1], buffer, max_buf);
                                 }
                             }
@@ -408,8 +433,7 @@ void schedule_FIFC()
 
                     strcpy(storage[0], strtok(buffer, " "));
 
-                    for (i = 1; i < 4; i++)
-                    {
+                    for (i = 1; i < 4; i++){
                         strcpy(storage[i], strtok(NULL, " "));
                     }
 
@@ -419,28 +443,22 @@ void schedule_FIFC()
                     strncpy(time_buf, &storage[2][0], 2);       // substring
                     hour = atoi(time_buf)-9;           // string to int
 
-                    tid = -1;
-                    for (i = 0; i < team_size; i++)
-                    {
-                        if (strcmp(teams[i].team_name, storage[0]) == 0)
-                        {
-                            tid = i;
+                    for (i = 0; i < team_size; i++){
+                        if (!strcmp(teams[i].team_name, storage[0])){
+                            strcpy(pro_name, teams[i].project_name);
+                            break;
                         }
                     }
-                    if (tid == -1)
-                    {
-                        printf("team name not found!\n");
-                        return;
-                    }
 
+                    sprintf(buffer, "%s|%s|%s|%s|%s", storage[1], storage[2], storage[3], storage[0], pro_name);        //store booking info to buffer for copy
                     //set clander timeslot to team_id
                     for(i = 0; i < atoi(storage[3]); i++){
                         // check for time slot whether used
-                        if(calendar[day][hour+i] == -1){
-                            calendar[day][hour+i] = tid;
+                        if(calendar[day][hour+i][0] == '\0'){
+                            strcpy(calendar[day][hour+i], buffer);
                         }else{
                             for(j = 0; j < i; j++){
-                                calendar[day][hour+j] = -1;
+                                calendar[day][hour+j][0] = '\0';
                             }
                             break;
                         }
@@ -449,11 +467,8 @@ void schedule_FIFC()
             }
         }
 
-        while (wait(NULL) > 0)
-            ; // wait for all child finish
-    }
-    else
-    {                                           // parent to sorting all booking and assign to the child
+        while (wait(NULL) > 0); // wait for all child finish
+    }else{                                           // parent to sorting all booking and assign to the child
         FILE *file = fopen("booking.dat", "r"); // to open the booking file
         // variable for convert message from child to int
         char temp[200];
@@ -502,7 +517,6 @@ void schedule_FIFC()
         for(i = 0 ; i < max_week ; i++){
             write(fd[i*2][1], "no-booking", max_buf);                             // write the no-booking to all week
         }
-
         for(i = 0; i < max_week; i++){
             while(1){
                 buffer[0] = '\0';   //clear buffer
@@ -519,15 +533,11 @@ void schedule_FIFC()
                 strcpy(temp, strtok(NULL, " "));
                 time = atoi(temp);
 
-                // get tid
-                strcpy(temp, strtok(NULL, " "));
-                tid = atoi(temp);
-
-                calendar[date][time] = tid;
+                strcpy(calendar[date][time], strtok(NULL, " "));
             }
         }
-        wait(NULL);
-        return;
+        print_calendar("FCFS");
+        // wait(NULL);
     }
 }
 
