@@ -454,6 +454,7 @@ void schedule_FCFS(){
                         
                         close(fd[week*2][0]); // close parent to child output
                         close(fd[week*2+1][1]); // close child to parent intput
+                        printf("exit\n");
                         exit(0);
                     }
 
@@ -494,6 +495,7 @@ void schedule_FCFS(){
         }
 
         while (wait(NULL) > 0); // wait for all child finish
+        exit(0);
     }else{                                           // parent to sorting all booking and assign to the child
         FILE *file = fopen("booking.dat", "r"); // to open the booking file
         // variable for convert message from child to int
@@ -563,7 +565,7 @@ void schedule_FCFS(){
             }
         }
         print_calendar("FCFS");
-        while(wait(NULL) > 0);
+        wait(NULL);
         return;
     }
 }

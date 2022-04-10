@@ -152,7 +152,7 @@ int main(){
                 printf("booking.txt and sorted removed!\n");
             }
             printf("bye\n");
-            break;
+            return(0);
         } else{ printf("Unaccepted input, please input the correct input.\n"); }
     }   
     return(0);
