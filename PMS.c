@@ -151,7 +151,6 @@ int main(){
             if (remove("booking.txt") == 0 && remove("sorted.dat") == 0){
                 printf("booking.txt and sorted removed!\n");
             }
-            
             printf("bye\n");
             break;
         } else{ printf("Unaccepted input, please input the correct input.\n"); }

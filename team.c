@@ -336,16 +336,44 @@ void print_calendar(char *algorithm){
             }
         }
     }
-    char temp_start[120], temp_end[120];      //temp for copy the info of start and end period
-    strcpy(temp_start, calendar[period[0]][period[1]]);
+    char temp[120], temp_end[120];      //temp for copy the info of start and end period
+    strcpy(temp, calendar[period[0]][period[1]]);
     strcpy(temp_end, calendar[period[2]][period[3]]);
 
-    printf("Period: %s to %s\n", strtok(temp_start, "|"), strtok(temp_end, "|"));
+    printf("Period: %s to %s\n", strtok(temp, "|"), strtok(temp_end, "|"));
 
-    printf("Date\t\tStart\tEnd\t\tTeam\t\tProject\n");
-    printf("============================================================================================");
+    printf("%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
+    printf("==========================================================================================================================================================\n");
 
-    // to-do 
+    // check calendar and print the booking info
+    // int k, col_size[] = {13, 7, 7, 50, 50};
+    temp[0] = '\0';     //clear temp
+    char info[5][50], time_temp[5];
+    int end_hour;
+    for(i = 0; i < period[2]+1; i++){
+        for(j = 0; j < 9; j++){
+            if(calendar[i][j][0] != '\0'){
+                if(strcmp(temp, calendar[i][j])){   //check temp and the booking info is not same
+                    strcpy(temp, calendar[i][j]);
+                    // printf("%s\n", temp);
+                    int k;
+                    strcpy(info[0], strtok(temp, "|"));
+                    for(k = 1; k < 5; k++){
+                        strcpy(info[k], strtok(NULL, "|"));
+                    }
+
+                    //convert duration to end datetime
+                    strncpy(time_temp, &info[1][0], 2);       // substring
+                    end_hour = atoi(time_temp) + atoi(info[2]);           // start time + duration
+                    sprintf(info[2], "%d:00", end_hour);
+
+                    // printf("\n");
+                    printf("%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
+                    strcpy(temp, calendar[i][j]);
+                }
+            }
+        }
+    }
 
     return;
 }
@@ -378,12 +406,10 @@ void schedule_FCFS(){
         }
     }
     pid = fork();
-    if (pid < 0)
-    {
+    if (pid < 0){
         printf("Fork failed\n");
         exit(1);
-    }
-    else if (pid == 0){             // child
+    }else if (pid == 0){             // child
         int hour; // store the int of hour
         int day_offset[] = {-25, 4, 3};
         char pro_name[50];  //store the project name of team
@@ -537,7 +563,8 @@ void schedule_FCFS(){
             }
         }
         print_calendar("FCFS");
-        // wait(NULL);
+        while(wait(NULL) > 0);
+        return;
     }
 }
 
