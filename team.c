@@ -316,8 +316,16 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
 
 
 void print_calendar(char *algorithm){
-    printf("*** Project Meeting ***\n\n");
-    printf("Algorithm used: %s\n", algorithm);
+    char temp[120], temp2[120], line_temp[200];
+    strcat(temp, "Schedule_", algorithm);
+    strcat(temp, temp, ".txt");
+    FILE* file = fopen(temp, "w+");
+    close(file);
+    file = fopen(temp, "a+");
+
+    fputs("*** Project Meeting ***\n\n", file);
+    sprintf(line_temp, "Algorithm used: %s\n", algorithm);
+    fputs(line_temp, file);
 
     // for check period
     int period[4] = {-1, -1, -1, -1}, i, j; 
@@ -336,14 +344,15 @@ void print_calendar(char *algorithm){
             }
         }
     }
-    char temp[120], temp_end[120];      //temp for copy the info of start and end period
     strcpy(temp, calendar[period[0]][period[1]]);
-    strcpy(temp_end, calendar[period[2]][period[3]]);
+    strcpy(temp2, calendar[period[2]][period[3]]);
 
-    printf("Period: %s to %s\n", strtok(temp, "|"), strtok(temp_end, "|"));
+    sprintf(line_temp, "Period: %s to %s\n", strtok(temp, "|"), strtok(temp2, "|"));
+    fputs(line_temp, file);
 
-    printf("%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
-    printf("==========================================================================================================================================================\n");
+    sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
+    fputs(line_temp, file);
+    fputs("==========================================================================================================================================================\n", file);
 
     // check calendar and print the booking info
     // int k, col_size[] = {13, 7, 7, 50, 50};
@@ -368,7 +377,8 @@ void print_calendar(char *algorithm){
                     sprintf(info[2], "%d:00", end_hour);
 
                     // printf("\n");
-                    printf("%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
+                    sprintf(line_temp, "%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
+                    fputs(line_temp, file);
                     strcpy(temp, calendar[i][j]);
                 }
             }
@@ -382,18 +392,18 @@ void print_calendar(char *algorithm){
 void schedule_FCFS(){
     static int max_week = 3;  // max week
     static int max_buf = 200; // max length of buffer
+    static int max_reject = 1000;   // max length of rejected list
 
-    int booking_count;                // for counting the numbers of booking
-    int pid, week, i, j;              // comment var for child to use, and be counter
-    int fd[6][2];                     // for pipe, each week 2 pipes
-    char storage[4][50], buffer[200]; // buffer for store data from file
-    char time_buf[3];                // buffer for store the substring in datetime
-    int day;                     // store int of booking
+    int booking_count;                  // for counting the numbers of booking
+    int pid, week, i, j;                // comment var for child to use, and be counter
+    int fd[6][2];                       // for pipe, each week 2 pipes
+    char storage[4][50], buffer[200];   // buffer for store data from file
+    char time_buf[3];                   // buffer for store the substring in datetime
+    int day;                            // store int of booking
 
     // init pipe, i*2 for parent to child, 1*2+1 for child to parent
     for (i = 0; i < max_week; i++){
-        if (pipe(fd[i * 2]) < 0 || pipe(fd[i * 2 + 1]) < 0)
-        {
+        if (pipe(fd[i * 2]) < 0 || pipe(fd[i * 2 + 1]) < 0){
             printf("Pipe creation error\n");
             exit(1);
         }
@@ -405,6 +415,7 @@ void schedule_FCFS(){
             calendar[i][j][0] = '\0';
         }
     }
+
     pid = fork();
     if (pid < 0){
         printf("Fork failed\n");
@@ -487,6 +498,8 @@ void schedule_FCFS(){
                             for(j = 0; j < i; j++){
                                 calendar[day][hour+j][0] = '\0';
                             }
+                            sprintf(buffer, "reject %s %s %s %s", storage[0], storage[1], storage[2], storage[3]);
+                            write(fd[week * 2 + 1][1], buffer, max_buf);
                             break;
                         }
                     }
@@ -501,6 +514,8 @@ void schedule_FCFS(){
         // variable for convert message from child to int
         char temp[200];
         int date, time;
+        char reject[max_reject][100];            // rejected list of booking
+        int reject_index = 0;                 // index of rejected
 
         for (i = 0; i < max_week; i++)
         {
@@ -549,19 +564,22 @@ void schedule_FCFS(){
             while(1){
                 buffer[0] = '\0';   //clear buffer
                 while(!strcmp(buffer, "")) read(fd[i*2+1][0], buffer, max_buf);
+                if(!strncmp(buffer, "reject", 6)){
+                    strcpy(reject[reject_index], buffer+7, strlen(buffer)-7);
+                    reject_index++;
+                }else if(!strcmp(buffer, "end")){   //check end of booking
+                    break;
+                }else{          // success booking
+                    // get date
+                    strcpy(temp, strtok(buffer, " "));
+                    date = atoi(temp);
 
-                //check end of booking
-                if(!strcmp(buffer, "end")) break;
+                    // get time
+                    strcpy(temp, strtok(NULL, " "));
+                    time = atoi(temp);
 
-                // get date
-                strcpy(temp, strtok(buffer, " "));
-                date = atoi(temp);
-
-                // get time
-                strcpy(temp, strtok(NULL, " "));
-                time = atoi(temp);
-
-                strcpy(calendar[date][time], strtok(NULL, " "));
+                    strcpy(calendar[date][time], strtok(NULL, " "));
+                }
             }
         }
         print_calendar("FCFS");
