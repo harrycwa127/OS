@@ -687,4 +687,446 @@ void schedule_Priority()
         fputs(bookingArray[i], sorted);
     }
     fclose(sorted);
+
+    // Start scheduling
+    int toParent[3][2], toChild[3][2];
+    
+    // Pipe initiation
+    for (i=0;i<3;i++)
+    {
+        if (pipe(toParent[i]) < 0){
+            printf("toParent Pipe error\n");
+        }
+        if (pipe(toChild[i]) < 0 ){
+            printf("toChild pipe error\n");
+        }
+    }
+
+    // child calendar initiation
+    // calendar[18][9][120]
+    for (i = 0; i < 18; i++){
+        for (j = 0; j < 9; j++){
+            calendar[i][j][0] = '\0';
+        }
+    }
+
+    int pid;
+    pid = fork();
+    if (pid<0)
+    {
+        printf("Fork error\n");
+    }
+    else if (pid == 0)
+    {
+        for (i=0;i<3;i++)
+        {
+            pid = fork();
+            if (pid<0)
+            {
+                printf("Fork error: grandchild\n");
+            }
+            else if (pid == 0) // Child process: scheduling
+            {
+                // close not use pipe
+                close(toParent[i][0]);
+                close(toChild[i][1]);
+                
+                int n;
+
+                printf("Child %d: start\n", i);
+
+                buffer[0] = '\0';
+                while ((n=read(toChild[i][0], buffer, 100)) > 0)
+                {
+                    if (strcmp(buffer, "receive job")==0)
+                    {
+                        printf("%s\n", buffer);
+                        break;    
+                    }
+                    buffer[0] = '\0';
+                }
+
+                char receivedJobs[1000][100];
+                int jobNum = 0;
+
+                buffer[0] = '\0';
+                // Start receive jobs
+                while((n=read(toChild[i][0], buffer, 100)) > 0)
+                {
+                    if (strcmp(buffer, "no jobs to receive") ==0 )
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        strcpy(receivedJobs[jobNum], buffer);
+                        printf("child %d: received: %s\n", i, receivedJobs[jobNum]);
+                        jobNum++;
+                    }
+                    buffer[0] = '\0';
+                }
+
+                // Start scheduling
+                
+                // print received jobs
+                printf("Child %d: received %d jobs\n", i, jobNum);
+                if (jobNum > 0)
+                {
+                    for (j=0;j<jobNum;j++)
+                    {
+                    printf("Child %d: %s\n", i, receivedJobs[j]);
+                    }
+                }
+
+                // exit when no job assigned
+                if (jobNum == 0)
+                {
+                    buffer[0] = '\0';
+                    strcpy(buffer, "empty");
+                    write(toParent[i][1], buffer, 100);
+                    printf("Child %d: Ends with no job\n", i);
+                    exit(0);
+                }
+
+                // Get the team name, date, time, duration
+                date1[0] = '\0';
+                time1[0] = '\0';
+                name1[0] = '\0';
+                duration1 = ' ';
+                temp[0] = '\0';
+                char hour[2], actualDate[2];
+                int day;
+
+                char rejectedList[54][100];
+                int rejectedSize = 0;
+                for (j = 0; j<jobNum;j++)
+                {
+                    printf("Child %d: doing job %d\n", i, j);
+                    strcpy(temp, receivedJobs[j]);
+                    // Team_A 2022-04-25 09:00 2
+                    strcpy(temp, strtok(temp, " ")); // get team name
+                    strcpy(name1, temp); // Team_A
+
+                    strcpy(temp, strtok(NULL, " ")); // get date
+                    strcpy(date1, temp); // 2022-04-25
+                    actualDate[0] = date1[8];
+                    actualDate[1] = date1[9]; // actualDate = 25
+                    day = atoi(actualDate);
+                    // Convert to the correct date index according to the child's week
+                    switch (i)
+                    {
+                        case 0:
+                            day = day - 25;
+                            break;
+                        case 1:
+                            day = day + 4 ;
+                            break;
+                        case 2:
+                            day = day + 3;
+                            break;
+                    }
+
+                    strcpy(temp, strtok(NULL, " ")); // get time
+                    strcpy(time1, temp); // 09:00
+
+                    
+                    hour[0] = time1[0];
+                    hour[1] = time1[1]; // hour = 09
+
+                    int startTimeslot = atoi(hour) - 9;
+                    
+                    // printf("time1: %s\n", time1);
+                    // printf("strlen of receivedJobs %d\n", strlen(receivedJobs[j]));
+                    
+                    int l = strlen(receivedJobs[j]) - 2;
+                    // printf("l: %d\n", l);
+                    
+                    duration1 = receivedJobs[j][l];
+                    // printf("duration1: %c\n", duration1);
+
+                    int dur = duration1 - '0';
+                    // printf("dur: %d\n", dur);
+
+                    // strncpy(time1, time1, 5);
+
+                    // put the job to the child calendar
+                    // char childCalendar[6][9][100];
+                    // Team_A 2022-04-25 09:00 2
+                    // name1 = Team_A, calendar index = 0, startTimeslot = 0, dur = 2
+                    printf("name: %s, calendar index: %d, startTimeslot: %d, dur: %d\n", name1, day, startTimeslot, dur);
+                    int k;
+                    bool used = false;
+                    for (k = startTimeslot; k < startTimeslot + dur; k++)
+                    {
+                        if (calendar[day][k][0] != '\0')
+                        {
+                            printf("calendar[%d][%d]: %s, true\n", day, k, calendar[day][k]);
+                            used = true;
+                        }
+                        else
+                        {
+                            printf("calendar[%d][%d]: %s, false\n", day, k, calendar[day][k]);
+                        }
+                    }
+
+                    // find project name
+                    char pro_name[50];
+                    for (k = 0; k < team_size; k++){
+                        if (!strcmp(teams[k].team_name, name1)){
+                            strcpy(pro_name, teams[k].project_name);
+                            break;
+                        }
+                    }
+                    
+                    // sprintf(buffer, "%s|%s|%s|%s|%s", storage[1], storage[2], storage[3], storage[0], pro_name);
+                    // date|start_time|duration|team_name|project_name
+                    if (used == false)
+                    {
+                        for (k = startTimeslot; k < startTimeslot + dur; k++)
+                        {
+                            char cat[100];
+                            sprintf(cat, "%s|%s|%c|%s|%s", date1, time1, duration1, name1, pro_name);
+                            printf("cat: %s\n", cat);
+            
+                            strcpy(calendar[day][k], cat);
+                            printf("calendar[%d][%d]: %s\n", day, k, calendar[day][k]);
+                        }
+                    }
+                    if (used == true)
+                    {
+                        strcpy(rejectedList[rejectedSize], receivedJobs[j]);
+                        printf("rejected: %s\n", rejectedList[rejectedSize]);
+                        rejectedSize++;
+                    }
+                } // end of jobs for loop
+                
+                // Tell parent result
+                buffer[0] = '\0';
+                strcpy(buffer, "receive results");
+                write(toParent[i][1], buffer, 100);
+                printf("Child %d: tell parent results\n", i);
+
+                int k;
+                j = i*6;
+                printf("j: %d\n", j);
+                for (j=i*6; j < i+6; j++)
+                {
+                    for (k=0;k<9;k++)
+                    {
+                        // printf("Child %d: calendar[%d][%d]: %s\n", i,j,k, calendar[j][k]);
+                        if (calendar[j][k][0] != '\0') // calendar[j][k] 0
+                        {
+                            printf("calendar[%d][%d]: %s\n", j, k, calendar[j][k]);
+                            buffer[0] = '\0';
+                            temp[0] = '\0';
+                            strcpy(buffer, calendar[j][k]); // i j date|start_time|duration|team_name|project_name
+                            // printf("buffer: %s\n", buffer);
+                            
+                            sprintf(temp, "%d %d ", j, k);
+                            // printf("temp: %s\n", temp);
+                            
+                            strcat(temp, buffer);
+                            printf("temp after cat: %s\n", temp);
+                            write(toParent[i][1], buffer, 100);               
+                        }
+                    }
+                }
+
+                // tell parent completed reporting results
+                buffer[0] = '\0';
+                strcpy(buffer, "complete results");
+                write(toParent[i][1], buffer, 100);
+                printf("Child %d: told parent results\n", i);
+
+                buffer[0] = '\0';
+                strcpy(buffer, "receive rejectedList");
+                write(toParent[i][1], buffer, 100);
+                printf("Child %d: tell parent rejected\n", i);
+
+                // tell parent rejected booking
+                for (j = 0; j < rejectedSize; j++)
+                {
+                    buffer[0] = '\0';
+                    strcpy(buffer, rejectedList[j]);
+                    write(toParent[i][1], buffer, 100);
+                }
+
+                buffer[0] = '\0';
+                strcpy(buffer, "complete rejectedList");
+                write(toParent[i][1], buffer, 100);
+                printf("Child %d: tell parent finish\n", i);
+
+                exit(0);
+            } // Child process: scheduling end
+
+        } // end of child for loop
+        while (wait(NULL)>0); // no need parent processing for scheduling
+        exit(0);
+    }
+    else // Parent processing: grand parent
+    {
+        for (i=0;i<3;i++)
+        {
+            close(toChild[i][0]);
+        }
+
+        printf("Parent start!\n");
+
+        // Read the sorted.dat to distribute jobs to grandchildren
+        FILE *sortedBooking;
+        sortedBooking = fopen("sorted.dat", "r");
+        int day;
+
+        buffer[0] = '\0';
+        // Tell child to receive jobs
+        for (i=0;i<3;i++)
+        {
+            strcpy(buffer, "receive job");
+            write(toChild[i][1], buffer, 100);
+            buffer[0] = '\0';
+        }
+
+        buffer[0] = '\0';
+        while (fgets(buffer, 100, sortedBooking) != NULL)
+        {
+            // temp is copy of for get substring
+            printf("Current line: %s\n", buffer);
+            strcpy(temp, buffer);
+            
+            // Get the date from temp
+            strcpy(temp, strtok(temp, " "));
+            strcpy(temp, strtok(NULL, " "));
+            strcpy(date1, temp);
+
+            printf("date: %s\n", date1); // 2022-04-25
+            char d[2];           
+            d[0] = date1[8];
+            d[1] = date1[9];
+            
+            
+            day = atoi(d);
+            // check for week
+            if (day >= 25 && day <= 30)
+            {
+                write(toChild[0][1], buffer, 100); // write the booking to week 0
+            }
+            else if (day >= 2 && day <= 7)
+            {
+                write(toChild[1][1], buffer, 100); // write the booking to week 1
+            }
+            else if (day >= 9 && day <= 14)
+            {
+                write(toChild[2][1], buffer, 100); // write the booking to week 2
+            }
+            else
+            {
+                printf("Parent: Error, 【%s】 date not in range\n", buffer);
+            }
+            buffer[0] = '\0';
+        }
+
+        buffer[0] = '\0';
+
+        // Tell grand children job distribution complete
+        for (i=0;i<3;i++){
+            strcpy(buffer, "no jobs to receive");
+            write(toChild[i][1], buffer,100);
+            buffer[0] = '\0';
+        }
+
+        // Receive results from children
+        for (i=0; i<3;i++)
+        {
+            while (true)
+            {
+                buffer[0] = '\0';
+                read(toParent[i][0], buffer, 100);
+                if (strcmp(buffer, "empty")==0){
+                    break;
+                }
+                if (strcmp(buffer, "receive results") ==0 )
+                {
+                    break;
+                }
+            }
+        }
+        printf("Parent start receiving results\n");
+
+        // Start receiving success results
+        for (i=0; i<3; i++)
+        {
+            while (true)
+            {                
+                buffer[0] = '\0';
+                temp[0] = '\0';
+                read(toParent[i][0], buffer, 100);
+
+                if (strcmp(buffer, "complete results")==0) // add empty
+                {
+                    break;
+                }
+
+                // get date
+                strcpy(temp, strtok(buffer, " "));
+                int d = atoi(temp);
+
+                // get time
+                strcpy(temp, strtok(NULL, " "));
+                int t = atoi(temp);
+
+                strcpy(calendar[d][t], strtok(NULL, " "));
+
+            }
+        }
+        printf("Parent received all results\n");
+
+        // Start receiving rejected results
+        for (i = 0; i < 3; i++)
+        {
+            while (true)
+            {
+                buffer[0] = '\0';
+                read(toParent[i][0], buffer, 100);
+                if (strcmp(buffer, "receive rejectedList")==0)
+                {
+                    break;
+                }
+            }
+        }
+        printf("Parent start receiving rejects\n");
+
+        char reject[1000][100];
+        int rSize = 0;
+        // Receive
+        for (i = 0; i < 3; i++)
+        {
+            while (true)
+            {
+                buffer[0] = '\0';
+                read(toParent[i][0], buffer, 100);
+                if (strcmp(buffer, "complete rejectedList")==0)
+                {
+                    break;
+                }
+                strcpy(reject[rSize], buffer);
+                rSize++;                
+            }
+        }
+        printf("Parent finish\n");
+
+        // print_calendar("Priority of alphabet");
+        wait(NULL);
+
+    } // parent processing end
+    // close the remaining pipe
+    for(i=0;i<3;i++){
+        close(toChild[i][1]);
+        close(toParent[i][1]);
+    }
+
+    // for (i=0;i<3;i++){
+    //     wait(NULL);
+    // }
+    return;
+
 }
