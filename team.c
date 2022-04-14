@@ -5,6 +5,7 @@
 #include <time.h>
 
 #define team_max 1000
+#define reject_max 1000
 
 struct Team
 {
@@ -18,7 +19,10 @@ struct Team
 
 struct Team teams[team_max];
 int team_size = 0;
-char calendar[18][9][120]; // used for part 3 to store the info of booking
+char calendar[18][9][120];          // used for part 3 to store the info of booking
+char reject[1000][120];             // used for part 3 to store the info of rejected booking
+int reject_index = 0;               // index of rejected booking in part 3
+
 
 void Team_Init(){
     int i, j, k;
@@ -366,7 +370,6 @@ void print_calendar(char *algorithm){
                     end_hour = atoi(time_temp) + atoi(info[2]);           // start time + duration
                     sprintf(info[2], "%d:00", end_hour);
 
-                    // printf("\n");
                     sprintf(line_temp, "%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
                     fputs(line_temp, file);
                     strcpy(temp, calendar[i][j]);
@@ -375,6 +378,18 @@ void print_calendar(char *algorithm){
         }
     }
 
+    fputs("\n", file);
+
+    //print rejected booking info
+    fputs("*** Meeting Request ***\n\n", file);
+    sprintf(line_temp, "There are %d requested rejected for the required period.\n\n", reject_index+1);
+    fputs(line_temp, file);
+    fputs("==========================================================================================================================================================\n", file);
+
+    for(i = 0; i < reject_index + 1; i++){
+        sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
+        fputs(line_temp, file);
+    }
     return;
 }
 
@@ -382,11 +397,10 @@ void print_calendar(char *algorithm){
 void schedule_FCFS(){
     static int max_week = 3;  // max week
     static int max_buf = 200; // max length of buffer
-    static int max_reject = 1000;   // max length of rejected list
 
     int booking_count;                  // for counting the numbers of booking
     int pid, week, i, j;                // comment var for child to use, and be counter
-    int fd[6][2];                       // for pipe, each week 2 pipes
+    int fd[max_week * 2][2];                       // for pipe, each week 2 pipes
     char storage[4][50], buffer[200];   // buffer for store data from file
     char time_buf[3];                   // buffer for store the substring in datetime
     int day;                            // store int of booking
@@ -405,6 +419,12 @@ void schedule_FCFS(){
             calendar[i][j][0] = '\0';
         }
     }
+
+    //init reject
+    for(i = 0; i < reject_index; i++){
+        reject[i][0] = '\0';
+    }
+    reject_index = 0;
 
     //check booking.dat exit
     if( access("booking.dat", F_OK ) != 0 ) {
@@ -508,18 +528,13 @@ void schedule_FCFS(){
         // variable for convert message from child to int
         char temp[200];                         // temp is copy of for get substring
         int date, time;
-        char reject[max_reject][120];            // rejected list of booking
-        int reject_index = 0;                 // index of rejected
 
-        for (i = 0; i < max_week; i++)
-        {   
+        for (i = 0; i < max_week; i++){   
             close(fd[i * 2][0]);     // close parent to child output
             close(fd[i * 2 + 1][1]); // close child to parent intput
         }
         // read file line by line
         while (fgets(buffer, max_buf, file)){   // have bug, dont know why
-        printf("testing\n");
-
             strcpy(temp, buffer);
             strcpy(storage[0], strtok(temp, " "));
             for (i = 1; i < 4; i++)
