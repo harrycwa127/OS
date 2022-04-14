@@ -19,8 +19,12 @@ void PrintMenu(){
 
 int main(){
     Team_Init();
+    // delete the booking.dat and sorted.dat           
+    remove("booking.dat");
+    remove("sorted.dat");
+
     while(1){
-        char choice[2];
+        char choice[3];
         PrintMenu();
         printf("  Enter an option: ");
         scanf("%s", choice);
@@ -147,13 +151,9 @@ int main(){
         } else if (strcmp(choice, "3c") == 0){
             printf("choice %s\n", choice);      //debug use
         } else if (strcmp(choice, "4") == 0){
-            // delete the booking.txt           
-            if (remove("booking.txt") == 0 && remove("sorted.dat") == 0){
-                printf("booking.txt and sorted removed!\n");
-            }
             printf("bye\n");
             return(0);
         } else{ printf("Unaccepted input, please input the correct input.\n"); }
-    }   
+    }
     return(0);
 }

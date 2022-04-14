@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <time.h>
 
 #define team_max 1000
@@ -19,8 +20,7 @@ struct Team teams[team_max];
 int team_size = 0;
 char calendar[18][9][120]; // used for part 3 to store the info of booking
 
-void Team_Init()
-{
+void Team_Init(){
     int i, j, k;
     for (i = 0; i < team_max; i++)
     {
@@ -43,8 +43,7 @@ void Team_Init()
     }
 }
 
-void print_team(int i)
-{ // debug use
+void print_team(int i){ // debug use
     int j;
     printf("================debug use===============\n");
     printf("team id \t%d\n", teams[i].team_id);
@@ -90,44 +89,34 @@ void print_team(int i)
 void create_team(char team_detail[7][100])
 {
     int i, j, k, l, n = 0;
-    for (i = 0; i < team_size; i++)
-    { // loop though all the teams to check duplicate team name and project name
-        if (strcmp(team_detail[0], teams[i].team_name) == 0 && strcmp(team_detail[1], teams[i].project_name) == 0)
-        {
+    for (i = 0; i < team_size; i++){        // loop though all the teams to check duplicate team name and project name
+        if (strcmp(team_detail[0], teams[i].team_name) == 0 && strcmp(team_detail[1], teams[i].project_name) == 0){
             printf("Error: same team name with same project name existed\n", team_detail[0], team_detail[1]);
             return;
         }
     }
     // replace the newline with end of string
     for (i = 0; i < 4; i++)
-        for (j = 0; j < 100; j++)
-        {
+        for (j = 0; j < 100; j++){
             if (team_detail[i + 2][j] == '\n')
                 team_detail[i + 2][j] = '\0';
         }
     for (i = 0; i < 4; i++)
-        for (j = i; j < 4; j++)
-        {
+        for (j = i; j < 4; j++){
             if (i == j)
                 continue;
-            if (strcmp(team_detail[i + 2], team_detail[j + 2]) == 0)
-            {
+            if (strcmp(team_detail[i + 2], team_detail[j + 2]) == 0){
                 printf("Error: same name appear twice (%s)\n", team_detail[i + 2]);
                 return;
             }
         }
-    while (1)
-    { // if the team id is equal to -1, need to add one until the team id is -1
-        if (teams[team_size].team_id == -1)
-        {
-            for (i = 2; i < 6; i++)
-            { // member name will be inside the team_detail[2-5], while index 2 is the manager.
-                if (strcmp(team_detail[i], "") == 0)
-                {
+    while (1){ // if the team id is equal to -1, need to add one until the team id is -1
+        if (teams[team_size].team_id == -1){
+            for (i = 2; i < 6; i++){ // member name will be inside the team_detail[2-5], while index 2 is the manager.
+                if (strcmp(team_detail[i], "") == 0){
                     break;
                 }
-                else
-                {
+                else{
                     for (k = 0; k < team_size; k++)
                         if (strcmp(team_detail[2], teams[k].member[0]) == 0)
                         { // check for the user if he/she is other team's manager
@@ -316,11 +305,12 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
 
 
 void print_calendar(char *algorithm){
-    char temp[120], temp2[120], line_temp[200];
-    strcat(temp, "Schedule_", algorithm);
-    strcat(temp, temp, ".txt");
+    char temp[200], temp2[200], line_temp[200];
+    strcpy(temp, "Schedule_");
+    strcat(temp, algorithm);
+    strcat(temp, ".txt");
     FILE* file = fopen(temp, "w+");
-    close(file);
+    fclose(file);
     file = fopen(temp, "a+");
 
     fputs("*** Project Meeting ***\n\n", file);
@@ -328,7 +318,7 @@ void print_calendar(char *algorithm){
     fputs(line_temp, file);
 
     // for check period
-    int period[4] = {-1, -1, -1, -1}, i, j; 
+    int period[4] = {-1, -1, -1, -1}, i, j;
     for(i = 0; i < 18; i++){
         for(j = 0; j < 9; j++){
             if(calendar[i][j][0] != '\0'){
@@ -416,6 +406,11 @@ void schedule_FCFS(){
         }
     }
 
+    //check booking.dat exit
+    if( access("booking.dat", F_OK ) != 0 ) {
+        printf("There are not exist booking record!");
+    }
+
     pid = fork();
     if (pid < 0){
         printf("Fork failed\n");
@@ -450,7 +445,6 @@ void schedule_FCFS(){
                     while(strcmp(buffer, "") == 0) read(fd[week*2][0], buffer, max_buf);  //wait for read and read booking
 
                     if(!strcmp(buffer, "no-booking")){
-
                         // return the reuslt to parent
                         for (i = 0; i < 18; i++){
                             for (j = 0; j < 9; j++){
@@ -465,7 +459,6 @@ void schedule_FCFS(){
                         
                         close(fd[week*2][0]); // close parent to child output
                         close(fd[week*2+1][1]); // close child to parent intput
-                        printf("exit\n");
                         exit(0);
                     }
 
@@ -498,6 +491,7 @@ void schedule_FCFS(){
                             for(j = 0; j < i; j++){
                                 calendar[day][hour+j][0] = '\0';
                             }
+
                             sprintf(buffer, "reject %s %s %s %s", storage[0], storage[1], storage[2], storage[3]);
                             write(fd[week * 2 + 1][1], buffer, max_buf);
                             break;
@@ -510,23 +504,22 @@ void schedule_FCFS(){
         while (wait(NULL) > 0); // wait for all child finish
         exit(0);
     }else{                                           // parent to sorting all booking and assign to the child
-        FILE *file = fopen("booking.dat", "r"); // to open the booking file
+        FILE *file = fopen("booking.dat", "r+");      // to open the booking file
         // variable for convert message from child to int
-        char temp[200];
+        char temp[200];                         // temp is copy of for get substring
         int date, time;
-        char reject[max_reject][100];            // rejected list of booking
+        char reject[max_reject][120];            // rejected list of booking
         int reject_index = 0;                 // index of rejected
 
         for (i = 0; i < max_week; i++)
-        {
+        {   
             close(fd[i * 2][0]);     // close parent to child output
             close(fd[i * 2 + 1][1]); // close child to parent intput
         }
-
         // read file line by line
-        while (fgets(buffer, max_buf, file) != NULL)
-        {
-            // temp is copy of for get substring
+        while (fgets(buffer, max_buf, file)){   // have bug, dont know why
+        printf("testing\n");
+
             strcpy(temp, buffer);
             strcpy(storage[0], strtok(temp, " "));
             for (i = 1; i < 4; i++)
@@ -560,12 +553,14 @@ void schedule_FCFS(){
         for(i = 0 ; i < max_week ; i++){
             write(fd[i*2][1], "no-booking", max_buf);                             // write the no-booking to all week
         }
+
         for(i = 0; i < max_week; i++){
             while(1){
                 buffer[0] = '\0';   //clear buffer
                 while(!strcmp(buffer, "")) read(fd[i*2+1][0], buffer, max_buf);
+
                 if(!strncmp(buffer, "reject", 6)){
-                    strcpy(reject[reject_index], buffer+7, strlen(buffer)-7);
+                    strncpy(reject[reject_index], buffer+7, strlen(buffer)-7);
                     reject_index++;
                 }else if(!strcmp(buffer, "end")){   //check end of booking
                     break;
@@ -582,8 +577,8 @@ void schedule_FCFS(){
                 }
             }
         }
-        print_calendar("FCFS");
         wait(NULL);
+        print_calendar("FCFS");
         return;
     }
 }
