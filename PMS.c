@@ -21,7 +21,7 @@ int main(){
     while(1){
         char choice[2];
         PrintMenu();
-        printf("  Enter an option(Type 0 for back to menu): ");
+        printf("  Enter an option");
         scanf("%s", choice);
         if (strcmp(choice, "0") == 0){}
         else if (strcmp(choice, "1") == 0){
@@ -29,7 +29,7 @@ int main(){
             while ((c = getchar()) != '\n' && c != EOF);
             while(1){
                 char input[606];
-                printf("Enter> ");
+                printf("Enter (Type 0 for back to menu) > ");
                 fgets(input,305,stdin);
                 if(input[0] == '0') break;
                 char *ptr = strtok(input, " ");
