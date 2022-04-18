@@ -21,7 +21,7 @@ int main(){
     while(1){
         char choice[2];
         PrintMenu();
-        printf("  Enter an option: ");
+        printf("  Enter an option(Type 0 for back to menu): ");
         scanf("%s", choice);
         if (strcmp(choice, "0") == 0){}
         else if (strcmp(choice, "1") == 0){
