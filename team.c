@@ -309,20 +309,18 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
 
 
 void print_calendar(char *algorithm){
-    char temp[200], temp2[200], line_temp[200];
-    strcpy(temp, "Schedule_");
-    strcat(temp, algorithm);
-    strcat(temp, ".txt");
-    FILE* file = fopen(temp, "w+");
+    char temp[200], temp2[200], line_temp[200], file_name[30];
+    char info[5][50], time_temp[5], member_name[50];
+    int end_hour, team_count, member_count;
+    strcpy(file_name, "Schedule_");
+    strcat(file_name, algorithm);
+    strcat(file_name, ".txt");
+    FILE* file = fopen(file_name, "w+");
     fclose(file);
-    file = fopen(temp, "a+");
-
-    fputs("*** Project Meeting ***\n\n", file);
-    sprintf(line_temp, "Algorithm used: %s\n", algorithm);
-    fputs(line_temp, file);
+    file = fopen(file_name, "a+");
 
     // for check period
-    int period[4] = {-1, -1, -1, -1}, i, j;
+    int period[4] = {-1, -1, -1, -1}, i, j, k;
     for(i = 0; i < 18; i++){
         for(j = 0; j < 9; j++){
             if(calendar[i][j][0] != '\0'){
@@ -341,44 +339,55 @@ void print_calendar(char *algorithm){
     strcpy(temp, calendar[period[0]][period[1]]);
     strcpy(temp2, calendar[period[2]][period[3]]);
 
-    sprintf(line_temp, "Period: %s to %s\n", strtok(temp, "|"), strtok(temp2, "|"));
+    fputs("*** Project Meeting ***\n\n", file);
+    sprintf(line_temp, "Algorithm used: %s\n", algorithm);
     fputs(line_temp, file);
 
-    sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
+    sprintf(line_temp, "Period: %s to %s\n\n", strtok(temp, "|"), strtok(temp2, "|"));
     fputs(line_temp, file);
-    fputs("==========================================================================================================================================================\n", file);
 
     // check calendar and print the booking info
     // int k, col_size[] = {13, 7, 7, 50, 50};
     temp[0] = '\0';     //clear temp
-    char info[5][50], time_temp[5];
-    int end_hour;
-    for(i = 0; i < period[2]+1; i++){
-        for(j = 0; j < 9; j++){
-            if(calendar[i][j][0] != '\0'){
-                if(strcmp(temp, calendar[i][j])){   //check temp and the booking info is not same
-                    strcpy(temp, calendar[i][j]);
-                    // printf("%s\n", temp);
-                    int k;
-                    strcpy(info[0], strtok(temp, "|"));
-                    for(k = 1; k < 5; k++){
-                        strcpy(info[k], strtok(NULL, "|"));
+
+    for(team_count = 0; team_count < team_size; team_count++) {
+        if(teams[team_count].team_id == -1)  break;
+
+        sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
+        fputs(line_temp, file);
+        fputs("==========================================================================================================================================================\n", file);
+
+        for(i = 0; i < period[2]+1; i++){
+            for(j = 0; j < 9; j++){
+                if(calendar[i][j][0] != '\0'){
+                    if(strcmp(temp, calendar[i][j])){   //check temp and the booking info is not same
+                        strcpy(temp, calendar[i][j]);
+                        strcpy(info[0], strtok(temp, "|"));
+                        for(k = 1; k < 5; k++){
+                            strcpy(info[k], strtok(NULL, "|"));
+                        }
+
+                        if(!strcmp(info[3], teams[team_count].team_name)){
+                            //convert duration to end datetime
+                            strncpy(time_temp, &info[1][0], 2);       // substring
+                            end_hour = atoi(time_temp) + atoi(info[2]);           // start time + duration
+                            sprintf(info[2], "%d:00", end_hour);
+
+                            sprintf(line_temp, "%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
+                            fputs(line_temp, file);
+                        }
+                        
+                        strcpy(temp, calendar[i][j]);
                     }
-
-                    //convert duration to end datetime
-                    strncpy(time_temp, &info[1][0], 2);       // substring
-                    end_hour = atoi(time_temp) + atoi(info[2]);           // start time + duration
-                    sprintf(info[2], "%d:00", end_hour);
-
-                    sprintf(line_temp, "%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
-                    fputs(line_temp, file);
-                    strcpy(temp, calendar[i][j]);
                 }
             }
         }
+        fputs("==========================================================================================================================================================\n", file);
+        sprintf(line_temp, "Team: %s\n", teams[team_count].team_name);
+        fputs(line_temp, file);  //team name
+        fputs("\n\n", file);
     }
-
-    fputs("\n", file);
+    
 
     //print rejected booking info
     fputs("*** Meeting Request ***\n\n", file);
@@ -390,6 +399,11 @@ void print_calendar(char *algorithm){
         sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
         fputs(line_temp, file);
     }
+    fputs("==========================================================================================================================================================\n", file);
+
+    
+    fclose(file);
+    prtinf("Printed. Export file name: %s\n", file_name);
     return;
 }
 
