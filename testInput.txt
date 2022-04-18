@@ -1,7 +1,9 @@
 1. Create Project Team
 
-2 same team name different Project
+Normal case:
 Team_A Project_A Alan Cathy Fanny Helen
+
+error case:same team name different Project
 Team_A Project_B Alan Cathy Fanny Helen
 
 only 1 Man 1 mem - 2 mem
@@ -15,4 +17,4 @@ error case:more than 3 member
 Team_X Project_X Helen Alan Billy Cathy Fanny Helen
 
 error case:same Project name 
-Team_X Project_A Helen Cathy Fanny Alan
+Team_X Project_X Helen Cathy Fanny Alan
