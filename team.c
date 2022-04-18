@@ -1122,8 +1122,8 @@ void schedule_Priority()
         printf("Parent received all results\n");
 
         // Start receiving rejected results
-        char reject[1000][100];
-        int rSize = 0;
+        // char reject[1000][120]; 
+        // int reject_index = 0;   
         
         for (i = 0; i < 3; i++)
         {
@@ -1145,8 +1145,8 @@ void schedule_Priority()
                         {
                             break;
                         }
-                        strcpy(reject[rSize], buffer);
-                        rSize++;                
+                        strcpy(reject[reject_index], buffer);
+                        reject_index++;                
                     }
                     break;
                 }
