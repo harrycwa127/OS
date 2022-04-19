@@ -778,11 +778,11 @@ void schedule_Priority()
     FILE *booking;
 
     char bookingArray[162][100];
-    char buffer[100];
+    char buffer[200];
     int bookingNum = 0;
 
     booking = fopen("booking.dat", "r");
-    while (fgets(buffer, 100, booking) != NULL)
+    while (fgets(buffer, 200, booking) != NULL)
     {
         strcpy(bookingArray[bookingNum], buffer);
         bookingNum++;
@@ -910,7 +910,7 @@ void schedule_Priority()
                 printf("Child %d: start\n", i);
 
                 buffer[0] = '\0';
-                while ((n=read(toChild[i][0], buffer, 100)) > 0)
+                while ((n=read(toChild[i][0], buffer, 200)) > 0)
                 {
                     if (strcmp(buffer, "receive job")==0)
                     {
@@ -925,7 +925,7 @@ void schedule_Priority()
 
                 buffer[0] = '\0';
                 // Start receive jobs
-                while((n=read(toChild[i][0], buffer, 100)) > 0)
+                while((n=read(toChild[i][0], buffer, 200)) > 0)
                 {
                     if (strcmp(buffer, "no jobs to receive") ==0 )
                     {
@@ -957,7 +957,7 @@ void schedule_Priority()
                 {
                     buffer[0] = '\0';
                     strcpy(buffer, "empty");
-                    write(toParent[i][1], buffer, 100);
+                    write(toParent[i][1], buffer, 200);
                     printf("Child %d: no job\n", i);
                     // exit(0);
                 }
@@ -1072,13 +1072,13 @@ void schedule_Priority()
                 if (jobNum != 0)
                 {
                     strcpy(buffer, "receive results");
-                    write(toParent[i][1], buffer, 100);
+                    write(toParent[i][1], buffer, 200);
                     printf("Child %d: tell parent results\n", i);
                 }
                 else if (jobNum == 0)
                 {
                     strcpy(buffer, "empty");
-                    write(toParent[i][1], buffer, 100);
+                    write(toParent[i][1], buffer, 200);
                     printf("Child %d: no results to tell\n", i);
                 }
                 
@@ -1099,7 +1099,7 @@ void schedule_Priority()
                             
                             strcat(temp, buffer);
                             printf("temp after cat: %s\n", temp);
-                            write(toParent[i][1], temp, 100);               
+                            write(toParent[i][1], temp, 200);               
                         }
                     }
                 }
@@ -1107,12 +1107,12 @@ void schedule_Priority()
                 // tell parent completed reporting results
                 buffer[0] = '\0';
                 strcpy(buffer, "complete results");
-                write(toParent[i][1], buffer, 100);
+                write(toParent[i][1], buffer, 200);
                 printf("Child %d: told parent results\n", i);
 
                 // Add wait parent signal to send rejected list
                 buffer[0] = '\0';
-                while ((n=read(toChild[i][0], buffer, 100)) > 0)
+                while ((n=read(toChild[i][0], buffer, 200)) > 0)
                 {
                     if (strcmp(buffer, "give rejected list") == 0)
                     {
@@ -1124,7 +1124,7 @@ void schedule_Priority()
 
                 buffer[0] = '\0';
                 strcpy(buffer, "receive rejectedList");
-                write(toParent[i][1], buffer, 100);
+                write(toParent[i][1], buffer, 200);
                 printf("Child %d: tell parent rejected\n", i);
 
                 // tell parent rejected booking
@@ -1132,13 +1132,13 @@ void schedule_Priority()
                 {
                     buffer[0] = '\0';
                     strcpy(buffer, rejectedList[j]);
-                    write(toParent[i][1], buffer, 100);
+                    write(toParent[i][1], buffer, 200);
                     printf("Child %d: rejected: %s\n", i, rejectedList[j]);
                 }
 
                 buffer[0] = '\0';
                 strcpy(buffer, "complete rejectedList");
-                write(toParent[i][1], buffer, 100);
+                write(toParent[i][1], buffer, 200);
                 printf("Child %d: tell parent finish\n", i);
 
                 exit(0);
@@ -1167,12 +1167,12 @@ void schedule_Priority()
         for (i=0;i<3;i++)
         {
             strcpy(buffer, "receive job");
-            write(toChild[i][1], buffer, 100);
+            write(toChild[i][1], buffer, 200);
             buffer[0] = '\0';
         }
 
         buffer[0] = '\0';
-        while (fgets(buffer, 100, sortedBooking) != NULL)
+        while (fgets(buffer, 200, sortedBooking) != NULL)
         {
             // temp is copy of for get substring
             printf("Current line: %s\n", buffer);
@@ -1194,15 +1194,15 @@ void schedule_Priority()
             total_request++;
             if (day >= 25 && day <= 30)
             {
-                write(toChild[0][1], buffer, 100); // write the booking to week 0
+                write(toChild[0][1], buffer, 200); // write the booking to week 0
             }
             else if (day >= 2 && day <= 7)
             {
-                write(toChild[1][1], buffer, 100); // write the booking to week 1
+                write(toChild[1][1], buffer, 200); // write the booking to week 1
             }
             else if (day >= 9 && day <= 14)
             {
-                write(toChild[2][1], buffer, 100); // write the booking to week 2
+                write(toChild[2][1], buffer, 200); // write the booking to week 2
             }
             else
             {
@@ -1217,7 +1217,7 @@ void schedule_Priority()
         // Tell grand children job distribution complete
         for (i=0;i<3;i++){
             strcpy(buffer, "no jobs to receive");
-            write(toChild[i][1], buffer,100);
+            write(toChild[i][1], buffer,200);
             buffer[0] = '\0';
         }
 
@@ -1227,7 +1227,7 @@ void schedule_Priority()
             while (true)
             {
                 buffer[0] = '\0';
-                read(toParent[i][0], buffer, 100);
+                read(toParent[i][0], buffer, 200);
                 if (strcmp(buffer, "empty")==0){
                     printf("Parent: received EMPTY from child %d\n", i);
                     break;
@@ -1250,7 +1250,7 @@ void schedule_Priority()
             {                
                 buffer[0] = '\0';
                 temp[0] = '\0';
-                read(toParent[i][0], buffer, 100);
+                read(toParent[i][0], buffer, 200);
                 if (strcmp(buffer, "complete results") == 0 || strcmp(buffer, "empty") == 0) // add empty
                 {
                     printf("Parent: received %s from child %d\n", buffer, i);
@@ -1311,17 +1311,17 @@ void schedule_Priority()
             // ask child to give rejected list
             buffer[0] = '\0';
             strcpy(buffer, "give rejected list");
-            write(toChild[i][1], buffer, 100);
+            write(toChild[i][1], buffer, 200);
             while (true)
             {
                 buffer[0] = '\0';
-                read(toParent[i][0], buffer, 100);
+                read(toParent[i][0], buffer, 200);
                 if (strcmp(buffer, "receive rejectedList")==0)
                 {
                     while (true)
                     {
                         buffer[0] = '\0';
-                        read(toParent[i][0], buffer, 100);
+                        read(toParent[i][0], buffer, 200);
                         if (strcmp(buffer, "complete rejectedList")==0)
                         {
                             break;
