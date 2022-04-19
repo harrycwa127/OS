@@ -12,7 +12,7 @@ void PrintMenu(){
     printf("\t2c.  Meeting Attendance\n\n");
     printf("3.\tPrint Meeting Schedule\n");
     printf("\t3a.  FCFS (First Come First Served)\n");
-    printf("\t3b.  XXXX (Another algorithm implemented)\n");
+    printf("\t3b.  POA  (Priority of alphabet)\n");
     printf("\t3c.  YYYY (Attendance Report)\n\n");
     printf("4.\tExit\n");
 }
@@ -34,7 +34,7 @@ int main(){
             while ((c = getchar()) != '\n' && c != EOF);
             while(1){
                 char input[606];
-                printf("Enter> ");
+                printf("Enter (0 for go back to menu)> ");
                 fgets(input,305,stdin);
                 if(input[0] == '0') break;
                 char *ptr = strtok(input, " ");
@@ -64,7 +64,7 @@ int main(){
             while ((c = getchar()) != '\n' && c != EOF);
             while(1){
                 char input[70];
-                printf("For %s, ", choice);
+                printf("Please input the Single Meeting Request: ");
                 fgets(input,70,stdin);
                 if(input[0] == '0') break;
                 char *ptr = strtok(input, " ");
@@ -93,7 +93,7 @@ int main(){
             char file_name[40];
 
             // ask for file_name
-            printf("For %s, ", choice);
+            printf("Please input the file name that included the Meeting Request: ");
             scanf("%s", &file_name);
             printf("Filename: %s\n", file_name);
             file = fopen(file_name, "r");
