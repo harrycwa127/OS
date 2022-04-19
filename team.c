@@ -579,6 +579,13 @@ void schedule_FCFS(){
     int day;                            // store int of booking
     int tid;                            // for get the tid
 
+    // reset counter
+    total_accepted = 0;     
+    for(i = 0; i < team_size; i++) {
+        teams[i].accepted_request = 0;
+        teams[i].total_request = 0;
+    }
+
     // init pipe, i*2 for parent to child, 1*2+1 for child to parent
     for (i = 0; i < max_week; i++){
         if (pipe(fd[i * 2]) < 0 || pipe(fd[i * 2 + 1]) < 0){
