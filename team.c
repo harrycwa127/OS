@@ -22,6 +22,9 @@ int team_size = 0;
 char calendar[18][9][120];          // used for part 3 to store the info of booking
 char reject[1000][120];             // used for part 3 to store the info of rejected booking
 int reject_index = 0;               // index of rejected booking in part 3
+char team_member_name[100][50];     //member record
+int number_of_member = 0;           //number of member
+
 
 
 void Team_Init(){
@@ -316,7 +319,6 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     fclose(booking);
 }
 
-
 void print_calendar(char *algorithm){
     char temp[200], temp2[200], line_temp[200], file_name[30];
     char info[5][50], time_temp[5], member_name[50];
@@ -410,12 +412,95 @@ void print_calendar(char *algorithm){
     }
     fputs("==========================================================================================================================================================\n", file);
 
-    
-    fclose(file);
-    printf("Printed. Export file name: %s\n", file_name);
-    return;
-}
+    //print Staff         
+    // sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
+    // fputs(line_temp, file);
+    // fputs("==========================================================================================================================================================\n", file);
+   
+    char s[100];
+    char temp_member[100];
+    int l,m;
+    int added = 0; // 0 = false, 1 = true
 
+
+    for (i = 0; i < team_size; i++){               // loop for every team
+        for (j = 0; j < teams[i].numOfMember; j++){ // for each team loop for every member
+            strcpy(temp_member , teams[i].member[j]);       //assign the name of member
+            added = 0;
+            if(number_of_member != 0){
+                for (k = 0; k < number_of_member; k++){
+                    if (strcmp(temp_member, team_member_name[k]) == 0){ // check for the user in the member list
+                        //printf("member %s added\n", temp_member);
+                        added = 1;
+                        break;
+                    }
+                }
+            }
+            if(added != 1){
+                strcpy(team_member_name[number_of_member] , temp_member);
+                number_of_member++;
+            }
+        }
+    }
+    //sort names in Alphabetical order
+    for(i=0;i<number_of_member;i++){
+      for(j=i+1;j<number_of_member;j++){
+         if(strcmp(team_member_name[i],team_member_name[j])>0){
+            strcpy(s,team_member_name[i]);
+            strcpy(team_member_name[i],team_member_name[j]);
+            strcpy(team_member_name[j],s);
+         }
+      }
+   }
+
+    for (i = 0; i < number_of_member; i++){             //loop each member
+        sprintf(line_temp,"Staff: %s\n",team_member_name[i]);
+        fputs(line_temp, file);
+        sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
+        fputs(line_temp, file);
+        fputs("==========================================================================================================================================================\n", file);  
+        for (j = 0; j < team_size; j++){               // loop for every team
+            for (k = 0; k < teams[j].numOfMember; k++){ // for each team loop for every member
+                if (strcmp(team_member_name[i], teams[j].member[k]) == 0){ // check for the member in the team
+                    //print team time list                  
+                        for(team_count = 0; team_count < team_size; team_count++) {
+                            if(teams[team_count].team_id == -1)  break;
+                            if(strcmp(teams[j].team_name, teams[team_count].team_name) == 0){
+                                for(l = 0; l < period[2]+1; l++){
+                                    for(m = 0; m < 9; m++){
+                                        if(calendar[l][m][0] != '\0'){
+                                            if(strcmp(temp, calendar[l][m])){   //check temp and the booking info is not same
+                                                strcpy(temp, calendar[l][m]);
+                                                strcpy(info[0], strtok(temp, "|"));
+                                                for(k = 1; k < 5; k++){
+                                                    strcpy(info[k], strtok(NULL, "|"));
+                                                }
+                                                if(!strcmp(info[3], teams[team_count].team_name)){
+                                                    //convert duration to end datetime
+                                                    strncpy(time_temp, &info[1][0], 2);       // substring
+                                                    end_hour = atoi(time_temp) + atoi(info[2]);           // start time + duration
+                                                    sprintf(info[2], "%d:00", end_hour);
+
+                                                    sprintf(line_temp, "%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
+                                                    fputs(line_temp, file);
+                                                }
+                                                strcpy(temp, calendar[l][m]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    
+                }
+            }
+        }
+        fputs("==========================================================================================================================================================\n", file);
+    }
+    fputs("- End - ",file);
+    fclose(file);
+    printf("Printed. Export file name: %s\n", file_name); 
+}
 
 void schedule_FCFS(){
     static int max_week = 3;  // max week
