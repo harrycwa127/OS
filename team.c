@@ -254,9 +254,10 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     }
     for (i = 0; i < duration; i++)
     {
-        if (teams[tid].calendar[day_index][time_index + i] != -1)
+        if (teams[tid].calendar[day_index][time_index + i] != -1){
             error = 1;
-        break;
+            break;
+        }
 
         if (time_index + i == 4){
             printf("The booking is include the lunch time!\n");
@@ -264,7 +265,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         }
 
         if (time_index < 4){
-            if (time_index + duration > 4)
+            if (time_index + duration >= 4)
             {
                 printf("The booking is include the lunch time!\n");
                 return;
