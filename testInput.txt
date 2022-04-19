@@ -4,17 +4,67 @@ Normal case:
 Team_A Project_A Alan Cathy Fanny Helen
 
 error case:same team name different Project
-Team_A Project_B Alan Cathy Fanny Helen
+Team_A Project_B David Cathy Fanny Helen
 
 only 1 Man 1 mem - 2 mem
 Team_B Project_C Billy Alan 
 Team_C Project_D Cathy Alan Billy
 
 error case:only 1 Man 
-Team_X Project_X Ala
+Team_X Project_X David
 
 error case:more than 3 member 
 Team_X Project_X Helen Alan Billy Cathy Fanny Helen
 
 error case:same Project name 
-Team_X Project_X Helen Cathy Fanny Alan
+Team_X Project_A Helen Cathy Fanny Alan
+
+-----------------
+2b and 3b test
+
+1. team Create
+Team_A Project_A Alan Cathy Fanny Helen
+Team_B Project_C Billy Alan 
+Team_C Project_D Cathy Alan Billy
+Team_X Project_X Helen Cathy Fanny
+
+* team_X for all error case in the Algorithm
+
+2b 
+r1.dat
+Team_A 2022-04-25 09:00 2 <-- ok
+Team_B 2022-04-26 15:00 3 <-- ok
+Team_X 2022-04-25 09:00 2 <-- duplicate time slot accepted but should reject in 3a and 3b
+Team_X 2022-04-25 12:00 2 <-- lunch time 
+Team_X 2022-04-25 10:00 2 <-- overlap time slot
+Team_A 2022-04-26 09:00 2 <-- ok 
+Team_X 2022-04-26 10:00 2 <-- duplicate time slot should reject in 3a and 3b
+Team_B 2022-04-27 10:00 3 <-- ok
+Team_B 2022-04-27 14:00 2 <-- ok
+Team_X 2022-04-27 17:00 3 <-- not ok more than 18:00
+Team_B 2022-04-27 16:00 1 <-- not ok more than 5h
+Team_B 2022-04-26 11:00 2 <-- ok
+Team_B 2022-04-25 16:00 2 <-- ok
+Team_A 2022-04-25 16:00 2 <-- duplicate time slot accepted but should be reject or not
+
+ 
+
+
+raw:
+Team_A 2022-04-25 09:00 2 
+Team_B 2022-04-26 15:00 3 
+Team_X 2022-04-25 09:00 2 
+Team_X 2022-04-25 12:00 2 
+Team_X 2022-04-25 10:00 2 
+Team_A 2022-04-26 09:00 2 
+Team_X 2022-04-26 10:00 2 
+Team_B 2022-04-27 10:00 3 
+Team_B 2022-04-27 14:00 2 
+Team_X 2022-04-27 17:00 3 
+Team_B 2022-04-27 16:00 1 
+Team_B 2022-04-26 11:00 2 
+Team_B 2022-04-25 16:00 2
+Team_A 2022-04-25 16:00 2
+
+3b
+-------------
