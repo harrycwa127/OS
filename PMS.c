@@ -41,7 +41,7 @@ int main(){
                 char storage[7][100];
                 int i;
                 //splite input
-                for(i=0;i<7;i++){ strcpy(storage[i], "");}
+                for(i=0;i<7;i++){ strcpy(storage[i], ""); }
                 for(i=0;i<7;i++){
                     strcpy(storage[i], ptr);
                     ptr = strtok(NULL, " ");
@@ -50,6 +50,12 @@ int main(){
                 //if more than 6 parameter
                 if(strcmp(storage[6], "") != 0){
                     printf("Error: Too many parameter\n");
+                }else if(strcmp(storage[0], "\n") == 0){
+                    printf("Error: No input\n");
+                }else if(strcmp(storage[1], "") == 0){
+                    printf("Error: Project name is required\n");
+                }else if(strcmp(storage[2], "") == 0){
+                    printf("Error: No manager in the team\n");
                 }else{
                     for(i=3;i<6;i++)
                         if(strcmp(storage[i], "\0") == 0){
