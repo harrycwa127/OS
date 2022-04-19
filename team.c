@@ -1271,6 +1271,8 @@ void schedule_Priority()
         printf("Parent start receiving results\n");
 
         // Start receiving success results
+        char previousStart[5];
+        strcpy(previousStart, "00:00");
         for (i=0; i<3; i++)
         {
             printf("listening from child %d\n", i);
@@ -1298,14 +1300,17 @@ void schedule_Priority()
                 int t = atoi(temp);
 
                 strcpy(calendar[d][t], strtok(NULL, " "));
-                total_accepted++;
-
                 
+
+                char currentStart[5];                
                 temp[0] = '\0';
                 strcpy(temp, strtok(copy, " "));
                 strcpy(temp, strtok(NULL, " "));
                 strcpy(temp, strtok(NULL, "|"));
                 strcpy(temp, strtok(NULL, "|"));
+
+                strcpy(currentStart, temp); // currentStart = 09:00
+
                 strcpy(temp, strtok(NULL, "|"));
                 strcpy(temp, strtok(NULL, "|"));
                 printf("Now temp: %s\n", temp); // temp = Team_A
@@ -1316,8 +1321,14 @@ void schedule_Priority()
                 // int total_request; // Class var
 
                 int tid = find_tid(temp);
-                teams[tid].total_request++;
-                teams[tid].accepted_request++;
+                printf("previous: %s, current: %s\n", previousStart, currentStart);
+                if (strcmp(previousStart, currentStart) != 0)
+                {
+                    teams[tid].total_request++;
+                    teams[tid].accepted_request++;
+                    total_accepted++;
+                }
+                strcpy(previousStart, currentStart);
             }
         }
         printf("Parent received all results\n");
