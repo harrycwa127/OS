@@ -24,7 +24,7 @@ char reject[1000][120];             // used for part 3 to store the info of reje
 int reject_index = 0;               // index of rejected booking in part 3
 char team_member_name[100][50];     //member record
 int number_of_member = 0;           //number of member
-
+int total_request = 0, total_received = 0, total_accepted = 0; // for cal performance
 
 
 void Team_Init(){
@@ -169,8 +169,8 @@ void create_team(char team_detail[7][100])
     }
 }
 
-void project_booking(char team_name[100], char date[11], char time[6], int duration)
-{
+void project_booking(char team_name[100], char date[11], char time[6], int duration){
+    total_request++;   //counting the reveived request
     char stryear[4];
     char strmonth[2];
     char strday[2];
@@ -294,6 +294,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         teams[tid].calendar[day_index][time_index + i] = tid;
     }
     printf("Accepted!!\n");
+    total_received++;   //counting the reveived booking
     // print_calendar();
 
     // write the valid book to the .dat
@@ -428,14 +429,14 @@ void print_calendar(char *algorithm){
     }
     //sort names in Alphabetical order
     for(i=0;i<number_of_member;i++){
-      for(j=i+1;j<number_of_member;j++){
-         if(strcmp(team_member_name[i],team_member_name[j])>0){
-            strcpy(s,team_member_name[i]);
-            strcpy(team_member_name[i],team_member_name[j]);
-            strcpy(team_member_name[j],s);
-         }
-      }
-   }
+        for(j=i+1;j<number_of_member;j++){
+            if(strcmp(team_member_name[i],team_member_name[j])>0){
+                strcpy(s,team_member_name[i]);
+                strcpy(team_member_name[i],team_member_name[j]);
+                strcpy(team_member_name[j],s);
+            }
+        }
+    }
 
     for (i = 0; i < number_of_member; i++){             //loop each member
         sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
@@ -499,19 +500,19 @@ void print_calendar(char *algorithm){
 
     // performance
     fputs("Performance:\n\n", file);
-    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f)\n");
+    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f)\n", total_received, (float)total_received /total_request);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f)\n");
+    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f)\n", total_accepted, (float)total_accepted /total_request);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f)\n\n");
+    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f)\n\n", reject_index, (float)reject_index /total_request);
     fputs(line_temp, file);
 
     fputs("Utilization of Time Slot:\n\n", file);
-    sprintf(line_temp, "\tAccepted request\t\t- %2.1f\n\n");
+    sprintf(line_temp, "\tAccepted request\t\t- %2.1f\n\n", (float)total_accepted /total_request);
     fputs(line_temp, file);
 
     //team
-    
+
 
 
 
@@ -714,6 +715,7 @@ void schedule_FCFS(){
                     time = atoi(temp);
 
                     strcpy(calendar[date][time], strtok(NULL, " "));
+                    total_accepted++;   // count accepted booking
                 }
             }
         }
