@@ -509,7 +509,7 @@ void print_calendar(char *algorithm){
     fputs(line_temp, file);
     fputs("==========================================================================================================================================================\n", file);
 
-    for(i = 0; i < reject_index + 1; i++){
+    for(i = 0; i < reject_index; i++){
         sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
         fputs(line_temp, file);
     }
@@ -522,9 +522,9 @@ void print_calendar(char *algorithm){
     fputs("Performance:\n\n", file);
     sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f)\n", total_received, (float)total_received/(float)total_request);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f)\n", total_accepted, (float)total_accepted/(float)total_request);
+    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f)\n", total_accepted, (float)total_accepted/(float)total_received);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f)\n\n", reject_index, (float)reject_index/(float)total_request);
+    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f)\n\n", reject_index, (float)reject_index/(float)total_received);
     fputs(line_temp, file);
 
     fputs("Utilization of Time Slot:\n\n", file);
@@ -535,14 +535,30 @@ void print_calendar(char *algorithm){
     fputs("\tTeam:\n", file);
     for(i = 0; i < team_size; i++){
         sprintf(line_temp, "\t%50s- %2.1f\n", teams[i].team_name, (float)teams[i].accepted_request/(float)teams[i].total_request);
+        fputs(line_temp, file);
     }
 
     //staff
+    int member_total = 0, member_accepted = 0;
     fputs("\tStaff:\n", file);
-    for(i = 0; i < team_size; i ++){
-        for(j = 0; j < teams[i].numOfMember; j++){
-            
+    for(i = 0; i < number_of_member; i++){
+        //reset request counter
+        member_total = 0;
+        member_accepted = 0;
+
+        // find all request
+        for(j = 0; j < team_size; j ++){
+            for(k = 0; k < teams[i].numOfMember; k++){
+                if(!strcmp(team_member_name[i], teams[j].member[k])){
+                    member_total += teams[j].total_request;
+                    member_accepted += teams[j].accepted_request;
+                }
+            }
         }
+
+        // print results
+        sprintf(line_temp, "\t%50s- %2.1f\n", team_member_name[i], (float)member_accepted/(float)member_total);
+        fputs(line_temp, file);
     }
 
 
@@ -757,7 +773,7 @@ void schedule_FCFS(){
                         teams[tid].total_request++;
                     }
                 }else{ // tid error
-                    printf("Error, team name 【%s】 not exist!\n", temp);
+                    printf("Error, team name 【%s】 not found!\n", temp);
                 }
             }
         }
