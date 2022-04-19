@@ -112,6 +112,10 @@ void print_team(int i){ // debug use
 void create_team(char team_detail[7][100])
 {
     int i, j, k, l, n = 0;
+    if(strlen(team_detail[0]) == 0){         //if no input
+        printf("Error: No input\n");
+        return;
+    }
     for (i = 0; i < team_size; i++){        // loop though all the teams to check duplicate team name and project name
         if (strcmp(team_detail[0], teams[i].team_name) == 0){
             printf("Error: same team name existed\n", team_detail[0], team_detail[1]);
@@ -207,6 +211,22 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     int hour = atoi(strhour);       // string to int
     int min = atoi(strmin);         // string to int
 
+    //char line[100];
+    char temp[100];
+    //printf("temp: %s\n", temp);
+    memset(temp, 0, sizeof temp);
+    strcat(temp,team_name);
+    strcat(temp, " ");
+    strcat(temp, date);
+    strcat(temp, " ");
+    strcat(temp, time);
+    strcat(temp, " ");
+    //char dur[8];
+    char temp_dur[8];
+    sprintf(temp_dur, "%d", duration);
+    strcat(temp, temp_dur);
+    printf("\nIn line: %s\n", temp);
+
     // error checking
     int error = 0;
     if (year != 2022)
@@ -278,7 +298,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
 
     // check lunch time
     if (time_index < 4){
-        if (time_index + duration >= 4)
+        if (time_index + duration > 4)
         {
             printf("The booking is include the lunch time!\n");
             return;
@@ -303,7 +323,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         if (teams[tid].calendar[day_index][i] == tid)
             total_hour++;
     }
-    printf("Total hours: %d\n", total_hour);
+    //printf("Total hours: %d\n", total_hour);
     if (total_hour + duration > 5)
     {
         printf("Rejected due to time limit exceeded!\n");
@@ -327,8 +347,9 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     char dur[8];
     sprintf(dur, "%d", duration);
     strcat(team_name, dur);
+    strcpy(line,"");
     strcpy(line, team_name);
-    printf("line: %s\n", line);
+    //printf("line: %s\n", line);
 
     FILE *booking;
     booking = fopen("booking.dat", "a+");
