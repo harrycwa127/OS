@@ -113,8 +113,12 @@ void create_team(char team_detail[7][100])
 {
     int i, j, k, l, n = 0;
     for (i = 0; i < team_size; i++){        // loop though all the teams to check duplicate team name and project name
-        if (strcmp(team_detail[0], teams[i].team_name) == 0 && strcmp(team_detail[1], teams[i].project_name) == 0){
-            printf("Error: same team name with same project name existed\n", team_detail[0], team_detail[1]);
+        if (strcmp(team_detail[0], teams[i].team_name) == 0){
+            printf("Error: same team name existed\n", team_detail[0], team_detail[1]);
+            return;
+        }
+        if(strcmp(team_detail[1], teams[i].project_name) == 0){
+            printf("Error: same project name existed\n", team_detail[0], team_detail[1]);
             return;
         }
     }
