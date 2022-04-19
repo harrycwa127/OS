@@ -359,7 +359,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
 }
 
 void print_calendar(char *algorithm){
-    char temp[200], temp2[200], line_temp[200], file_name[30];
+    char temp[200], temp2[200], line_temp[200], file_name[100];
     char info[5][50], time_temp[5], member_name[50];
     int end_hour, team_count, member_count;
     strcpy(file_name, "Schedule_");
