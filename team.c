@@ -509,7 +509,7 @@ void print_calendar(char *algorithm){
     fputs(line_temp, file);
     fputs("==========================================================================================================================================================\n", file);
 
-    for(i = 0; i < reject_index + 1; i++){
+    for(i = 0; i < reject_index; i++){
         sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
         fputs(line_temp, file);
     }
