@@ -262,6 +262,14 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
             printf("The booking is include the lunch time!\n");
             return;
         }
+
+        if (time_index < 4){
+            if (time_index + duration > 4)
+            {
+                printf("The booking is include the lunch time!\n");
+                return;
+            }
+        }
     }
     if (error)
     {
