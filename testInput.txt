@@ -44,6 +44,9 @@ Team_B 2022-04-27 14:00 2 <-- ok
 Team_X 2022-04-27 17:00 3 <-- not ok more than 18:00
 Team_B 2022-04-27 16:00 1 <-- not ok more than 5h
 Team_B 2022-04-26 11:00 2 <-- ok
+Team_B 2022-04-25 16:00 2 <-- ok
+Team_A 2022-04-25 16:00 2 <-- duplicate time slot accepted but should be reject or not
+
  
 
 
@@ -60,6 +63,8 @@ Team_B 2022-04-27 14:00 2
 Team_X 2022-04-27 17:00 3 
 Team_B 2022-04-27 16:00 1 
 Team_B 2022-04-26 11:00 2 
+Team_B 2022-04-25 16:00 2
+Team_A 2022-04-25 16:00 2
 
 3b
 -------------
