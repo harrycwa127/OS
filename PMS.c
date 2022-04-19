@@ -34,7 +34,7 @@ int main(){
             while ((c = getchar()) != '\n' && c != EOF);
             while(1){
                 char input[606];
-                printf("Enter (0 for go back to menu)> ");
+                printf("Enter (Type 0 for back to menu) > ");
                 fgets(input,305,stdin);
                 if(input[0] == '0') break;
                 char *ptr = strtok(input, " ");
