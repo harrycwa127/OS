@@ -394,23 +394,10 @@ void print_calendar(char *algorithm){
             }
         }
         fputs("==========================================================================================================================================================\n", file);
-        sprintf(line_temp, "Team: %s\n", teams[team_count].team_name);
+        sprintf(line_temp, "Team: %s\n\n", teams[team_count].team_name);
         fputs(line_temp, file);  //team name
-        fputs("\n\n", file);
     }
     
-
-    //print rejected booking info
-    fputs("*** Meeting Request ***\n\n", file);
-    sprintf(line_temp, "There are %d requested rejected for the required period.\n\n", reject_index+1);
-    fputs(line_temp, file);
-    fputs("==========================================================================================================================================================\n", file);
-
-    for(i = 0; i < reject_index + 1; i++){
-        sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
-        fputs(line_temp, file);
-    }
-    fputs("==========================================================================================================================================================\n", file);
 
     //print Staff         
     // sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
@@ -454,8 +441,6 @@ void print_calendar(char *algorithm){
    }
 
     for (i = 0; i < number_of_member; i++){             //loop each member
-        sprintf(line_temp,"Staff: %s\n",team_member_name[i]);
-        fputs(line_temp, file);
         sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
         fputs(line_temp, file);
         fputs("==========================================================================================================================================================\n", file);  
@@ -496,8 +481,24 @@ void print_calendar(char *algorithm){
             }
         }
         fputs("==========================================================================================================================================================\n", file);
+        sprintf(line_temp,"Staff: %s\n\n",team_member_name[i]);
+        fputs(line_temp, file);
     }
-    fputs("- End - ",file);
+
+    //print rejected booking info
+    fputs("*** Meeting Request ***\n\n", file);
+    sprintf(line_temp, "There are %d requested rejected for the required period.\n\n", reject_index+1);
+    fputs(line_temp, file);
+    fputs("==========================================================================================================================================================\n", file);
+
+    for(i = 0; i < reject_index + 1; i++){
+        sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
+        fputs(line_temp, file);
+    }
+    fputs("==========================================================================================================================================================\n\n", file);
+
+    sprintf(line_temp, "%70s\n", "- End -");
+    fputs(line_temp, file);
     fclose(file);
     printf("Printed. Export file name: %s\n", file_name); 
 }
