@@ -534,7 +534,7 @@ void print_calendar(char *algorithm){
     //team
     fputs("\tTeam:\n", file);
     for(i = 0; i < team_size; i++){
-        sprintf(line_temp, "\t%50s- %2.1f\n", teams[i].team_name, (float)teams[i].accepted_request/(float)teams[i].total_request);
+        sprintf(line_temp, "\t%50s - %2.1f\n", teams[i].team_name, (float)teams[i].accepted_request/(float)teams[i].total_request);
         fputs(line_temp, file);
     }
 
@@ -557,7 +557,7 @@ void print_calendar(char *algorithm){
         }
 
         // print results
-        sprintf(line_temp, "\t%50s- %2.1f\n", team_member_name[i], (float)member_accepted/(float)member_total);
+        sprintf(line_temp, "\t%50s - %2.1f\n", team_member_name[i], (float)member_accepted/(float)member_total);
         fputs(line_temp, file);
     }
 
