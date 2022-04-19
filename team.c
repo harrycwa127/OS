@@ -135,7 +135,7 @@ void create_team(char team_detail[7][100])
                         for (l = 0; l < teams[k].numOfMember; l++) // for each team loop for every member
                             if (strcmp(team_detail[i], teams[k].member[l]) == 0)
                             { // check for the user participate in other team
-                                printf("Testing: %s in %s\n", teams[k].member[l], teams[k].team_name);
+                                //printf("Testing: %s in %s\n", teams[k].member[l], teams[k].team_name);
                                 counter++;
                                 if (counter == 3)
                                 {
