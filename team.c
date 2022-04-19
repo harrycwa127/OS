@@ -1198,6 +1198,7 @@ void schedule_Priority()
             
             day = atoi(d);
             // check for week
+            total_request++;
             if (day >= 25 && day <= 30)
             {
                 write(toChild[0][1], buffer, 100); // write the booking to week 0
@@ -1213,6 +1214,7 @@ void schedule_Priority()
             else
             {
                 printf("Parent: Error, 【%s】 date not in range\n", buffer);
+                total_request -= 1;
             }
             buffer[0] = '\0';
         }
@@ -1254,14 +1256,16 @@ void schedule_Priority()
                 buffer[0] = '\0';
                 temp[0] = '\0';
                 read(toParent[i][0], buffer, 100);
-                printf("R: %s\n", buffer);
+                // printf("R: %s\n", buffer);
                 if (strcmp(buffer, "complete results") == 0 || strcmp(buffer, "empty") == 0) // add empty
                 {
                     printf("Parent: received %s from child %d\n", buffer, i);
                     break;
                 }
 
+                char copy[100];
                 printf("Parent: received: %s\n", buffer);
+                strcpy(copy, buffer);
                 // get date
                 strcpy(temp, strtok(buffer, " "));
                 int d = atoi(temp);
@@ -1271,7 +1275,26 @@ void schedule_Priority()
                 int t = atoi(temp);
 
                 strcpy(calendar[d][t], strtok(NULL, " "));
+                total_accepted++;
 
+                
+                temp[0] = '\0';
+                strcpy(temp, strtok(copy, " "));
+                strcpy(temp, strtok(NULL, " "));
+                strcpy(temp, strtok(NULL, "|"));
+                strcpy(temp, strtok(NULL, "|"));
+                strcpy(temp, strtok(NULL, "|"));
+                strcpy(temp, strtok(NULL, "|"));
+                printf("Now temp: %s\n", temp); // temp = Team_A
+                // d t date|start_time|duration|team_name|project_name
+                
+                // int total_request = 0, total_accepted = 0; // for cal performance GLOBAL
+                // int accepted_request; // Class var
+                // int total_request; // Class var
+
+                int tid = find_tid(temp);
+                teams[tid].total_request++;
+                teams[tid].accepted_request++;
             }
         }
         printf("Parent received all results\n");
@@ -1301,7 +1324,13 @@ void schedule_Priority()
                             break;
                         }
                         strcpy(reject[reject_index], buffer);
-                        reject_index++;                
+                        reject_index++;
+
+                        // add team.total request                
+                        temp[0] = '\0';
+                        strcpy(temp, strtok(buffer, " "));
+                        int tid = find_tid(temp);
+                        teams[tid].total_request++;
                     }
                     break;
                 }
