@@ -207,6 +207,22 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     int hour = atoi(strhour);       // string to int
     int min = atoi(strmin);         // string to int
 
+    //char line[100];
+    char temp[100];
+    //printf("temp: %s\n", temp);
+    memset(temp, 0, sizeof temp);
+    strcat(temp,team_name);
+    strcat(temp, " ");
+    strcat(temp, date);
+    strcat(temp, " ");
+    strcat(temp, time);
+    strcat(temp, " ");
+    //char dur[8];
+    char temp_dur[8];
+    sprintf(temp_dur, "%d", duration);
+    strcat(temp, temp_dur);
+    printf("\nIn line: %s\n", temp);
+
     // error checking
     int error = 0;
     if (year != 2022)
@@ -303,7 +319,6 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         if (teams[tid].calendar[day_index][i] == tid)
             total_hour++;
     }
-    //printf("Total hours: %d\n", total_hour);
     if (total_hour + duration > 5)
     {
         printf("Rejected due to time limit exceeded!\n");
@@ -328,7 +343,6 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     sprintf(dur, "%d", duration);
     strcat(team_name, dur);
     strcpy(line, team_name);
-    printf("line: %s\n", line);
 
     FILE *booking;
     booking = fopen("booking.dat", "a+");
