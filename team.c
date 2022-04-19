@@ -541,21 +541,21 @@ void print_calendar(char *algorithm){
 
     // performance
     fputs("Performance:\n\n", file);
-    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f\%)\n", total_received, ((float)total_received/(float)total_request)*100);
+    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f%%)\n", total_received, ((float)total_received/(float)total_request)*100);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f\%)\n", total_accepted, ((float)total_accepted/(float)total_received)*100);
+    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f%%)\n", total_accepted, ((float)total_accepted/(float)total_received)*100);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f\%)\n\n", reject_index, ((float)reject_index/(float)total_received)*100);
+    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f%%)\n\n", reject_index, ((float)reject_index/(float)total_received)*100);
     fputs(line_temp, file);
 
     fputs("Utilization of Time Slot:\n\n", file);
-    sprintf(line_temp, "\tAccepted request\t\t- %2.1f\%\n\n", ((float)total_accepted/(float)total_request)*100);
+    sprintf(line_temp, "\tAccepted request\t\t- %2.1f%%\n\n", ((float)total_accepted/(float)total_request)*100);
     fputs(line_temp, file);
 
     //team
     fputs("\tTeam:\n", file);
     for(i = 0; i < team_size; i++){
-        sprintf(line_temp, "\t%50s - %2.1f\%\n", teams[i].team_name, ((float)teams[i].accepted_request/(float)teams[i].total_request)*100);
+        sprintf(line_temp, "\t%50s - %2.1f%%\n", teams[i].team_name, ((float)teams[i].accepted_request/(float)teams[i].total_request)*100);
         fputs(line_temp, file);
     }
 
