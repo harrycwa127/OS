@@ -494,8 +494,27 @@ void print_calendar(char *algorithm){
     }
     fputs("==========================================================================================================================================================\n\n", file);
 
-    sprintf(line_temp, "%70s\n", "- End -");
+    sprintf(line_temp, "%70s\n\n", "- End -");
     fputs(line_temp, file);
+
+    // performance
+    fputs("Performance:\n\n", file);
+    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f)\n");
+    fputs(line_temp, file);
+    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f)\n");
+    fputs(line_temp, file);
+    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f)\n\n");
+    fputs(line_temp, file);
+
+    fputs("Utilization of Time Slot:\n\n", file);
+    sprintf(line_temp, "\tAccepted request\t\t- %2.1f\n\n");
+    fputs(line_temp, file);
+
+    //team
+    
+
+
+
     fclose(file);
     printf("Printed. Export file name: %s\n", file_name); 
 }
