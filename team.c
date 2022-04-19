@@ -109,7 +109,7 @@ void create_team(char team_detail[7][100])
         for (j = i; j < 4; j++){
             if (i == j)
                 continue;
-            if (strcmp(team_detail[i + 2], team_detail[j + 2]) == 0){
+            if (strcmp(team_detail[i + 2], team_detail[j + 2]) == 0 && strlen(team_detail[i + 2]) != 0 && strlen(team_detail[j + 2]) != 0){
                 printf("Error: same name appear twice (%s)\n", team_detail[i + 2]);
                 return;
             }
