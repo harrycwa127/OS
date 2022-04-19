@@ -327,7 +327,7 @@ void print_calendar(char *algorithm){
     char temp[200], temp2[200], line_temp[200], file_name[100];
     char info[5][50], time_temp[5], member_name[50];
     int end_hour, team_count, member_count;
-    strcpy(file_name, "Schedule_");
+    strcpy(file_name, "G28_Schedule_");
     strcat(file_name, algorithm);
     strcat(file_name, ".txt");
     FILE* file = fopen(file_name, "w+");
