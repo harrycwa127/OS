@@ -79,39 +79,13 @@ void print_team(int i){ // debug use
     printf("========================================\n");
 }
 
-// void print_calendar(int tid)
-// {
-//     int i, j;
-//     printf("\\\t");
-//     for (j = 0; j < 9; j++)
-//     {
-//         int num = j + 9;
-//         printf("%d-%d\t", num, num + 1);
-//     }
-//     printf("\n");
-//     for (i = 0; i < 18; i++)
-//     {
-//         int num = i + 25;
-//         if (num > 30)
-//         {
-//             num -= 30;
-//             if (num > 0)
-//                 num++;
-//             if (num > 7)
-//                 num++;
-//         }
-//         printf("%d\t", num);
-//         for (j = 0; j < 9; j++)
-//         {
-//             printf("%d\t", teams[tid].calendar[i][j]);
-//         }
-//         printf("\n");
-//     }
-// }
-
 void create_team(char team_detail[7][100])
 {
     int i, j, k, l, n = 0;
+    if(strlen(team_detail[0]) == 0){         //if no input
+        printf("Error: No input\n");
+        return;
+    }
     for (i = 0; i < team_size; i++){        // loop though all the teams to check duplicate team name and project name
         if (strcmp(team_detail[0], teams[i].team_name) == 0){
             printf("Error: same team name existed\n", team_detail[0], team_detail[1]);
@@ -155,7 +129,6 @@ void create_team(char team_detail[7][100])
                         for (l = 0; l < teams[k].numOfMember; l++) // for each team loop for every member
                             if (strcmp(team_detail[i], teams[k].member[l]) == 0)
                             { // check for the user participate in other team
-                                //printf("Testing: %s in %s\n", teams[k].member[l], teams[k].team_name);
                                 counter++;
                                 if (counter == 3)
                                 {
@@ -166,7 +139,7 @@ void create_team(char team_detail[7][100])
                     n++;
                 }
             }
-            if (n == 0)
+            if (n < 2)
             {
                 printf("Error: No manager in the team\n");
                 return;
@@ -177,7 +150,6 @@ void create_team(char team_detail[7][100])
             teams[team_size].numOfMember = n;
             for (i = 0; i < n; i++)
                 strcpy(teams[team_size].member[i], team_detail[i + 2]);
-            // print_team(team_size);
             printf("Project Team %s is created.\n", teams[team_size].team_name);
             team_size += 1;
             break;
@@ -206,6 +178,22 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     int day = atoi(strday);         // string to int
     int hour = atoi(strhour);       // string to int
     int min = atoi(strmin);         // string to int
+
+    //char line[100];
+    char temp[100];
+    //printf("temp: %s\n", temp);
+    memset(temp, 0, sizeof temp);
+    strcat(temp,team_name);
+    strcat(temp, " ");
+    strcat(temp, date);
+    strcat(temp, " ");
+    strcat(temp, time);
+    strcat(temp, " ");
+    //char dur[8];
+    char temp_dur[8];
+    sprintf(temp_dur, "%d", duration);
+    strcat(temp, temp_dur);
+    printf("\nIn line: %s\n", temp);
 
     // error checking
     int error = 0;
@@ -303,7 +291,6 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
         if (teams[tid].calendar[day_index][i] == tid)
             total_hour++;
     }
-    //printf("Total hours: %d\n", total_hour);
     if (total_hour + duration > 5)
     {
         printf("Rejected due to time limit exceeded!\n");
@@ -315,7 +302,6 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     }
     printf("Accepted!!\n");
     total_received++;   //counting the reveived booking
-    // print_calendar();
 
     // write the valid book to the .dat
     char line[100];
@@ -327,8 +313,8 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
     char dur[8];
     sprintf(dur, "%d", duration);
     strcat(team_name, dur);
+    strcpy(line,"");
     strcpy(line, team_name);
-    printf("line: %s\n", line);
 
     FILE *booking;
     booking = fopen("booking.dat", "a+");
@@ -338,7 +324,7 @@ void project_booking(char team_name[100], char date[11], char time[6], int durat
 }
 
 void print_calendar(char *algorithm){
-    char temp[200], temp2[200], line_temp[200], file_name[30];
+    char temp[200], temp2[200], line_temp[200], file_name[100];
     char info[5][50], time_temp[5], member_name[50];
     int end_hour, team_count, member_count;
     strcpy(file_name, "Schedule_");
@@ -405,7 +391,7 @@ void print_calendar(char *algorithm){
                             sprintf(line_temp, "%13s %7s %7s %50s %50s\n", info[0], info[1], info[2], info[3], info[4]);
                             fputs(line_temp, file);
                         }
-                        
+
                         strcpy(temp, calendar[i][j]);
                     }
                 }
@@ -415,13 +401,10 @@ void print_calendar(char *algorithm){
         sprintf(line_temp, "Team: %s\n\n", teams[team_count].team_name);
         fputs(line_temp, file);  //team name
     }
-    
 
-    //print Staff         
-    // sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
-    // fputs(line_temp, file);
-    // fputs("==========================================================================================================================================================\n", file);
-    
+
+    //print Staff
+
     char s[100];
     char temp_member[100];
     int l,m;
@@ -435,7 +418,6 @@ void print_calendar(char *algorithm){
             if(number_of_member != 0){
                 for (k = 0; k < number_of_member; k++){
                     if (strcmp(temp_member, team_member_name[k]) == 0){ // check for the user in the member list
-                        //printf("member %s added\n", temp_member);
                         added = 1;
                         break;
                     }
@@ -461,11 +443,11 @@ void print_calendar(char *algorithm){
     for (i = 0; i < number_of_member; i++){             //loop each member
         sprintf(line_temp, "%13s %7s %7s %50s %50s\n", "Date", "Start", "End", "Team", "Project");
         fputs(line_temp, file);
-        fputs("==========================================================================================================================================================\n", file);  
+        fputs("==========================================================================================================================================================\n", file);
         for (j = 0; j < team_size; j++){               // loop for every team
             for (k = 0; k < teams[j].numOfMember; k++){ // for each team loop for every member
                 if (strcmp(team_member_name[i], teams[j].member[k]) == 0){ // check for the member in the team
-                    //print team time list                  
+                    //print team time list
                         for(team_count = 0; team_count < team_size; team_count++) {
                             if(teams[team_count].team_id == -1)  break;
                             if(strcmp(teams[j].team_name, teams[team_count].team_name) == 0){
@@ -494,7 +476,7 @@ void print_calendar(char *algorithm){
                                 }
                             }
                         }
-                    
+
                 }
             }
         }
@@ -509,7 +491,7 @@ void print_calendar(char *algorithm){
     fputs(line_temp, file);
     fputs("==========================================================================================================================================================\n", file);
 
-    for(i = 0; i < reject_index + 1; i++){
+    for(i = 0; i < reject_index; i++){
         sprintf(line_temp, "%d. %s\n", i+1, reject[i]);
         fputs(line_temp, file);
     }
@@ -520,35 +502,51 @@ void print_calendar(char *algorithm){
 
     // performance
     fputs("Performance:\n\n", file);
-    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f)\n", total_received, (float)total_received/(float)total_request);
+    sprintf(line_temp, "Total Number of Requests Received: %d (%2.1f%%)\n", total_received, ((float)total_received/(float)total_request)*100);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f)\n", total_accepted, (float)total_accepted/(float)total_request);
+    sprintf(line_temp, "Total Number of Requests Accepted: %d (%2.1f%%)\n", total_accepted, ((float)total_accepted/(float)total_received)*100);
     fputs(line_temp, file);
-    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f)\n\n", reject_index, (float)reject_index/(float)total_request);
+    sprintf(line_temp, "Total Number of Requests Rejected: %d (%2.1f%%)\n\n", reject_index, ((float)reject_index/(float)total_received)*100);
     fputs(line_temp, file);
 
     fputs("Utilization of Time Slot:\n\n", file);
-    sprintf(line_temp, "\tAccepted request\t\t- %2.1f\n\n", (float)total_accepted/(float)total_request);
+    sprintf(line_temp, "\tAccepted request\t\t- %2.1f%%\n\n", ((float)total_accepted/(float)total_request)*100);
     fputs(line_temp, file);
 
     //team
     fputs("\tTeam:\n", file);
     for(i = 0; i < team_size; i++){
-        sprintf(line_temp, "\t%50s- %2.1f\n", teams[i].team_name, (float)teams[i].accepted_request/(float)teams[i].total_request);
+        sprintf(line_temp, "\t%50s - %2.1f%%\n", teams[i].team_name, ((float)teams[i].accepted_request/(float)teams[i].total_request)*100);
+        fputs(line_temp, file);
     }
 
     //staff
+    int member_total = 0, member_accepted = 0;
     fputs("\tStaff:\n", file);
-    for(i = 0; i < team_size; i ++){
-        for(j = 0; j < teams[i].numOfMember; j++){
-            
+    for(i = 0; i < number_of_member; i++){
+        //reset request counter
+        member_total = 0;
+        member_accepted = 0;
+
+        // find all request
+        for(j = 0; j < team_size; j ++){
+            for(k = 0; k < teams[i].numOfMember; k++){
+                if(!strcmp(team_member_name[i], teams[j].member[k])){
+                    member_total += teams[j].total_request;
+                    member_accepted += teams[j].accepted_request;
+                }
+            }
         }
+
+        // print results
+        sprintf(line_temp, "\t%50s - %2.1f\%\n", team_member_name[i], ((float)member_accepted/(float)member_total)*100);
+        fputs(line_temp, file);
     }
 
 
 
     fclose(file);
-    printf("Printed. Export file name: %s\n", file_name); 
+    printf("Printed. Export file name: %s\n", file_name);
 }
 
 void schedule_FCFS(){
@@ -562,6 +560,13 @@ void schedule_FCFS(){
     char time_buf[3];                   // buffer for store the substring in datetime
     int day;                            // store int of booking
     int tid;                            // for get the tid
+
+    // reset counter
+    total_accepted = 0;
+    for(i = 0; i < team_size; i++) {
+        teams[i].accepted_request = 0;
+        teams[i].total_request = 0;
+    }
 
     // init pipe, i*2 for parent to child, 1*2+1 for child to parent
     for (i = 0; i < max_week; i++){
@@ -634,7 +639,7 @@ void schedule_FCFS(){
                         }
 
                         write(fd[week*2+1][1], "end", max_buf);
-                        
+
                         close(fd[week*2][0]); // close parent to child output
                         close(fd[week*2+1][1]); // close child to parent intput
                         exit(0);
@@ -682,7 +687,7 @@ void schedule_FCFS(){
         char temp[200];                         // temp is copy of for get substring
         int date, time;
 
-        for (i = 0; i < max_week; i++){   
+        for (i = 0; i < max_week; i++){
             close(fd[i * 2][0]);     // close parent to child output
             close(fd[i * 2 + 1][1]); // close child to parent intput
         }
@@ -757,7 +762,7 @@ void schedule_FCFS(){
                         teams[tid].total_request++;
                     }
                 }else{ // tid error
-                    printf("Error, team name 【%s】 not exist!\n", temp);
+                    printf("Error, team name 【%s】 not found!\n", temp);
                 }
             }
         }
@@ -859,7 +864,7 @@ void schedule_Priority()
 
     // Start scheduling
     int toParent[3][2], toChild[3][2];
-    
+
     // Pipe initiation
     for (i=0;i<3;i++)
     {
@@ -899,7 +904,7 @@ void schedule_Priority()
                 // close not use pipe
                 close(toParent[i][0]);
                 close(toChild[i][1]);
-                
+
                 int n;
 
                 printf("Child %d: start\n", i);
@@ -910,7 +915,7 @@ void schedule_Priority()
                     if (strcmp(buffer, "receive job")==0)
                     {
                         printf("%s\n", buffer);
-                        break;    
+                        break;
                     }
                     buffer[0] = '\0';
                 }
@@ -936,7 +941,7 @@ void schedule_Priority()
                 }
 
                 // Start scheduling
-                
+
                 // print received jobs
                 printf("Child %d: received %d jobs\n", i, jobNum);
                 if (jobNum > 0)
@@ -998,23 +1003,17 @@ void schedule_Priority()
                     strcpy(temp, strtok(NULL, " ")); // get time
                     strcpy(time1, temp); // 09:00
 
-                    
+
                     hour[0] = time1[0];
                     hour[1] = time1[1]; // hour = 09
 
                     int startTimeslot = atoi(hour) - 9;
-                    
-                    // printf("time1: %s\n", time1);
-                    // printf("strlen of receivedJobs %d\n", strlen(receivedJobs[j]));
-                    
+
                     int l = strlen(receivedJobs[j]) - 2;
-                    // printf("l: %d\n", l);
-                    
+
                     duration1 = receivedJobs[j][l];
-                    // printf("duration1: %c\n", duration1);
 
                     int dur = duration1 - '0';
-                    // printf("dur: %d\n", dur);
 
                     // strncpy(time1, time1, 5);
 
@@ -1046,8 +1045,7 @@ void schedule_Priority()
                             break;
                         }
                     }
-                    
-                    // sprintf(buffer, "%s|%s|%s|%s|%s", storage[1], storage[2], storage[3], storage[0], pro_name);
+
                     // date|start_time|duration|team_name|project_name
                     if (used == false)
                     {
@@ -1056,7 +1054,7 @@ void schedule_Priority()
                             char cat[100];
                             sprintf(cat, "%s|%s|%c|%s|%s", date1, time1, duration1, name1, pro_name);
                             // printf("cat: %s\n", cat);
-            
+
                             strcpy(calendar[day][k], cat);
                             // printf("calendar[%d][%d]: %s\n", day, k, calendar[day][k]);
                         }
@@ -1068,7 +1066,7 @@ void schedule_Priority()
                         rejectedSize++;
                     }
                 } // end of jobs for loop
-                
+
                 // Tell parent result
                 buffer[0] = '\0';
                 if (jobNum != 0)
@@ -1083,30 +1081,25 @@ void schedule_Priority()
                     write(toParent[i][1], buffer, 100);
                     printf("Child %d: no results to tell\n", i);
                 }
-                
+
 
                 int k;
                 j = i*6; // to loop the child's processing week
-                // printf("j: %d\n", j);
                 for (j=i*6; j < i+6; j++)
                 {
                     for (k=0;k<9;k++)
                     {
-                        // printf("Child %d: calendar[%d][%d]: %s\n", i,j,k, calendar[j][k]);
                         if (calendar[j][k][0] != '\0') // calendar[j][k] 0
                         {
-                            // printf("calendar[%d][%d]: %s\n", j, k, calendar[j][k]);
                             buffer[0] = '\0';
                             temp[0] = '\0';
                             strcpy(buffer, calendar[j][k]); // i j date|start_time|duration|team_name|project_name
-                            // printf("buffer: %s\n", buffer);
-                            
+
                             sprintf(temp, "%d %d ", j, k);
-                            // printf("temp: %s\n", temp);
-                            
+
                             strcat(temp, buffer);
                             printf("temp after cat: %s\n", temp);
-                            write(toParent[i][1], temp, 100);               
+                            write(toParent[i][1], temp, 100);
                         }
                     }
                 }
@@ -1184,20 +1177,21 @@ void schedule_Priority()
             // temp is copy of for get substring
             printf("Current line: %s\n", buffer);
             strcpy(temp, buffer);
-            
+
             // Get the date from temp
             strcpy(temp, strtok(temp, " "));
             strcpy(temp, strtok(NULL, " "));
             strcpy(date1, temp);
 
             printf("date: %s\n", date1); // 2022-04-25
-            char d[2];           
+            char d[2];
             d[0] = date1[8];
             d[1] = date1[9];
-            
-            
+
+
             day = atoi(d);
             // check for week
+            total_request++;
             if (day >= 25 && day <= 30)
             {
                 write(toChild[0][1], buffer, 100); // write the booking to week 0
@@ -1213,6 +1207,7 @@ void schedule_Priority()
             else
             {
                 printf("Parent: Error, 【%s】 date not in range\n", buffer);
+                total_request -= 1;
             }
             buffer[0] = '\0';
         }
@@ -1246,22 +1241,25 @@ void schedule_Priority()
         printf("Parent start receiving results\n");
 
         // Start receiving success results
+        char previousStart[5];
+        strcpy(previousStart, "00:00");
         for (i=0; i<3; i++)
         {
             printf("listening from child %d\n", i);
             while (true)
-            {                
+            {
                 buffer[0] = '\0';
                 temp[0] = '\0';
                 read(toParent[i][0], buffer, 100);
-                printf("R: %s\n", buffer);
                 if (strcmp(buffer, "complete results") == 0 || strcmp(buffer, "empty") == 0) // add empty
                 {
                     printf("Parent: received %s from child %d\n", buffer, i);
                     break;
                 }
 
+                char copy[100];
                 printf("Parent: received: %s\n", buffer);
+                strcpy(copy, buffer);
                 // get date
                 strcpy(temp, strtok(buffer, " "));
                 int d = atoi(temp);
@@ -1272,14 +1270,42 @@ void schedule_Priority()
 
                 strcpy(calendar[d][t], strtok(NULL, " "));
 
+
+                char currentStart[5];
+                temp[0] = '\0';
+                strcpy(temp, strtok(copy, " "));
+                strcpy(temp, strtok(NULL, " "));
+                strcpy(temp, strtok(NULL, "|"));
+                strcpy(temp, strtok(NULL, "|"));
+
+                strcpy(currentStart, temp); // currentStart = 09:00
+
+                strcpy(temp, strtok(NULL, "|"));
+                strcpy(temp, strtok(NULL, "|"));
+                printf("Now temp: %s\n", temp); // temp = Team_A
+                // d t date|start_time|duration|team_name|project_name
+
+                // int total_request = 0, total_accepted = 0; // for cal performance GLOBAL
+                // int accepted_request; // Class var
+                // int total_request; // Class var
+
+                int tid = find_tid(temp);
+                printf("previous: %s, current: %s\n", previousStart, currentStart);
+                if (strcmp(previousStart, currentStart) != 0)
+                {
+                    teams[tid].total_request++;
+                    teams[tid].accepted_request++;
+                    total_accepted++;
+                }
+                strcpy(previousStart, currentStart);
             }
         }
         printf("Parent received all results\n");
 
         // Start receiving rejected results
-        // char reject[1000][120]; 
-        // int reject_index = 0;   
-        
+        // char reject[1000][120];
+        // int reject_index = 0;
+
         for (i = 0; i < 3; i++)
         {
             // ask child to give rejected list
@@ -1301,7 +1327,13 @@ void schedule_Priority()
                             break;
                         }
                         strcpy(reject[reject_index], buffer);
-                        reject_index++;                
+                        reject_index++;
+
+                        // add team.total request
+                        temp[0] = '\0';
+                        strcpy(temp, strtok(buffer, " "));
+                        int tid = find_tid(temp);
+                        teams[tid].total_request++;
                     }
                     break;
                 }
@@ -1310,7 +1342,7 @@ void schedule_Priority()
         printf("Parent received rejects\n");
         printf("Parent finish\n");
 
-        print_calendar("Priority of alphabet");
+        print_calendar("Priority_of_alphabet");
         wait(NULL);
 
     } // parent processing end
@@ -1320,9 +1352,6 @@ void schedule_Priority()
         close(toParent[i][1]);
     }
 
-    // for (i=0;i<3;i++){
-    //     wait(NULL);
-    // }
     return;
 
 }
