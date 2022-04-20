@@ -22,7 +22,7 @@ struct Team
 struct Team teams[team_max];
 int team_size = 0;
 char calendar[18][9][120];          // used for part 3 to store the info of booking
-char reject[1000][120];             // used for part 3 to store the info of rejected booking
+char reject[1000][150];             // used for part 3 to store the info of rejected booking
 int reject_index = 0;               // index of rejected booking in part 3
 char team_member_name[100][50];     //member record
 int number_of_member = 0;           //number of member
