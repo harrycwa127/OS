@@ -864,6 +864,17 @@ void schedule_Priority()
     // Start scheduling
     int toParent[3][2], toChild[3][2];
 
+    total_accepted = 0;
+    for(i = 0; i < team_size; i++) {
+        teams[i].accepted_request = 0;
+        teams[i].total_request = 0;
+    }
+
+    for(i = 0; i < reject_index; i++){
+        reject[i][0] = '\0';
+    }
+    reject_index = 0;
+
     // Pipe initiation
     for (i=0;i<3;i++)
     {
