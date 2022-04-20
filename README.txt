@@ -34,7 +34,7 @@ Then, select option 3b, then select option 4 exit the program
 <p>See scheduling output</p>
 
     cat G28_Schedule_Priority_of_alphabet.txt
-    
+
 ---
 
 Second test cases:
