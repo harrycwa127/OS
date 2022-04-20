@@ -727,6 +727,8 @@ void schedule_FCFS(){
             write(fd[i*2][1], "no-booking", max_buf);                             // write the no-booking to all week
         }
 
+        char previousTime[17];  // 2022-04-25 00:00
+        strcpy(previousTime, "2022-04-24 00:00");
         for(i = 0; i < max_week; i++){
             while(1){
                 buffer[0] = '\0';   //clear buffer
@@ -734,35 +736,68 @@ void schedule_FCFS(){
 
                 if(!strcmp(buffer, "end")) break;  //check end of booking
 
-                // find tid
                 strcpy(temp, buffer);
-                strtok(temp, "|");
-                for(j = 1; j < 3; j ++) strtok(NULL, "|");
-                strcpy(temp, strtok(NULL, "|"));
-                tid = find_tid(temp);
+                if(strncmp(buffer, "reject", 6) == 0) // reject Team_X 2022-04-25 09:00 2
+                {
+                    char tn[100];
+                    strcpy(tn, strtok(temp, " "));
+                    strcpy(tn, strtok(NULL, " "));
+                    tid = find_tid(tn);
 
-                if(tid != -1){
-                    if(!strncmp(buffer, "reject", 6)){
-                        strncpy(reject[reject_index], buffer+7, strlen(buffer)-7);
-                        reject_index++;
-                        teams[tid].total_request++;
-                    }else{          // success booking
-                        // get date
-                        strcpy(temp, strtok(buffer, " "));
-                        date = atoi(temp);
+                    tn[0] = '\0';
 
-                        // get time
-                        strcpy(temp, strtok(NULL, " "));
-                        time = atoi(temp);
 
-                        strcpy(calendar[date][time], strtok(NULL, " "));
+                    strcpy(tn, buffer);
+                    strtok(tn, " "); 
+                    strcpy(tn, strtok(NULL, "")); // Team_X 2022-04-25 09:00 2
+                    strcpy(reject[reject_index], tn);
+                    reject_index++;
+                    
+                    teams[tid].total_request++;
+                }
+                else
+                {
+                    // buffer: d t 2022-04-25|09:00|2|Team_X|project_Name
+                    // compare with "2022-04-24 00:00"
+
+                    // get date
+                    strcpy(temp, strtok(buffer, " "));
+                    date = atoi(temp);
+                    // get time
+                    strcpy(temp, strtok(NULL, " "));
+                    time = atoi(temp);
+                    strcpy(calendar[date][time], strtok(NULL, ""));
+
+                    temp[0] = '\0';
+                    strcpy(temp, calendar[date][time]); // temp: 2022-04-25|09:00|2|Team_X|project_Name
+                
+                    char d[11], t[6];
+                    strcpy(d, strtok(temp, "|"));
+                    strcpy(t, strtok(NULL, "|"));
+
+                    temp[0] = '\0';
+                    strcpy(temp, d);
+                    strcat(temp, " "); // "2022-04-24 "
+                    strcat(temp, t); // "2022-04-24 09:00"
+
+                    char copy[200], tn[100];
+                    strcpy(copy, calendar[date][time]);
+                    strcpy(tn, strtok(copy, "|")); // get date
+                    strcpy(tn, strtok(NULL, "|"));
+                    strcpy(tn, strtok(NULL, "|"));
+                    strcpy(tn, strtok(NULL, "|")); // get team name
+                    
+                    tid = find_tid(tn);
+
+                    if (strcmp(previousTime, temp) != 0)
+                    {
                         total_accepted++;   // count accepted booking
-
                         teams[tid].accepted_request++;
                         teams[tid].total_request++;
                     }
-                }else{ // tid error
-                    printf("Error, team name 【%s】 not found!\n", temp);
+                    strcpy(previousTime, temp);
+
+                    
                 }
             }
         }
@@ -1210,8 +1245,8 @@ void schedule_Priority()
         }
 
         // Start receiving success results
-        char previousStart[5];
-        strcpy(previousStart, "00:00");
+        char previousTime[17];
+        strcpy(previousTime, "2022-04-24 00:00");
         for (i=0; i<3; i++)
         {
             while (true)
@@ -1224,44 +1259,47 @@ void schedule_Priority()
                     break;
                 }
 
-                char copy[100];
+                char copy[200], copy2[200];
                 strcpy(copy, buffer);
+                strcpy(copy2, copy);
+
                 // get date
-                strcpy(temp, strtok(buffer, " "));
-                int d = atoi(temp);
+                strcpy(copy, strtok(copy2, " "));
+                int d = atoi(copy);
 
                 // get time
-                strcpy(temp, strtok(NULL, " "));
-                int t = atoi(temp);
+                strcpy(copy, strtok(NULL, " "));
+                int t = atoi(copy);
 
                 strcpy(calendar[d][t], strtok(NULL, " "));
-
-
-                char currentStart[5];
+         
                 temp[0] = '\0';
-                strcpy(temp, strtok(copy, " "));
-                strcpy(temp, strtok(NULL, " "));
-                strcpy(temp, strtok(NULL, "|"));
-                strcpy(temp, strtok(NULL, "|"));
+                strcpy(temp, calendar[d][t]);
+                char tempDate[11], tempTime[6];
+                strcpy(tempDate, strtok(temp, "|"));
+                strcpy(tempTime, strtok(NULL, "|"));
 
-                strcpy(currentStart, temp); // currentStart = 09:00
+                temp[0] = '\0';
+                strcpy(temp, tempDate);
+                strcat(temp, " ");
+                strcat(temp, tempTime);
 
-                strcpy(temp, strtok(NULL, "|"));
-                strcpy(temp, strtok(NULL, "|"));
-                // d t date|start_time|duration|team_name|project_name
+                copy[0] = '\0';
+                strcpy(copy, calendar[d][t]);
+                char tn[100];
+                strcpy(tn, strtok(copy, "|"));
+                strcpy(tn, strtok(NULL, "|"));
+                strcpy(tn, strtok(NULL, "|"));
+                strcpy(tn, strtok(NULL, "|"));
 
-                // int total_request = 0, total_accepted = 0; // for cal performance GLOBAL
-                // int accepted_request; // Class var
-                // int total_request; // Class var
-
-                int tid = find_tid(temp);
-                if (strcmp(previousStart, currentStart) != 0)
-                {
-                    teams[tid].total_request++;
-                    teams[tid].accepted_request++;
-                    total_accepted++;
-                }
-                strcpy(previousStart, currentStart);
+                int tid = find_tid(tn);
+                if (strcmp(previousTime, temp) != 0)
+                    {
+                        total_accepted++;   // count accepted booking
+                        teams[tid].accepted_request++;
+                        teams[tid].total_request++;
+                    }
+                strcpy(previousTime, temp); 
             }
         }
 
